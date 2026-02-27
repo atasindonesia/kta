@@ -465,11 +465,6 @@ input, button, select, textarea {
                     }); 
                 }
 
-
-
-                        provContainer.innerHTML += '<div class="prov-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden card-hover flex flex-col snap-center shrink-0 w-full min-w-full md:w-[320px] md:min-w-[320px] min-h-[250px] box-border" data-nama="'+safeNamaProvinsi.toLowerCase()+'" style="display: flex !important;"><div class="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 p-3"><h3 class="font-bold text-white text-center truncate">'+safeNamaProvinsi+'</h3></div><div class="p-5 flex-grow flex flex-col justify-between space-y-4"><div class="text-sm space-y-3"><div><p class="text-xs text-gray-500 font-bold mb-1">Helpdesk Admin Prov. :</p><p class="font-semibold text-gray-800 flex items-center">👤 '+(prov.nama_admin || '-')+'</p></div><div><p class="text-xs text-gray-500 font-bold mb-1">Kontak (HP/WA) :</p><a href="'+waUrl+'" target="_blank" class="font-semibold text-green-600 flex items-center hover:text-green-700"><i class="fa-brands fa-whatsapp text-green-500 text-xl mr-2"></i> '+(prov.hp_admin || '-')+'</a></div></div><a href="'+(prov.link_pendaftaran || '#')+'" target="_blank" class="block w-full text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-bold py-2 rounded shadow-md hover:opacity-90 transition text-sm">Daftar & Login Anggota</a></div></div>'; 
-                    }); 
-                }
                 document.getElementById('stat-daftar').innerText = tDaftar.toLocaleString('id-ID'); document.getElementById('stat-kta').innerText = tKTA.toLocaleString('id-ID'); document.getElementById('stat-aktif').innerText = tAktif.toLocaleString('id-ID'); document.getElementById('stat-tidak-aktif').innerText = tTidakAktif.toLocaleString('id-ID');
             } catch (err) { Swal.fire('Error', 'Ada Error Data: ' + err.message, 'error'); }
         }
