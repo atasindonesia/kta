@@ -17,6 +17,7 @@
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
 
@@ -227,7 +228,37 @@ input, button, select, textarea {
         </aside>
 
         <main class="flex-1 p-4 md:p-8 overflow-y-auto relative text-gray-800 mt-[60px] md:mt-0 h-full w-full">
-            <div id="menu-dashboard" class="menu-content"><h2 class="text-3xl font-bold text-navy mb-4">Selamat Datang di Panel Admin Pusat!</h2></div>
+           <div id="menu-dashboard" class="menu-content">
+                <h2 class="text-3xl font-bold text-navy mb-4">Selamat Datang di Panel Admin Pusat!</h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                    <div class="bg-white p-5 rounded-xl shadow border-b-4 border-cyan-500">
+                        <p class="text-xs text-gray-500 font-bold mb-1">Total Provinsi</p>
+                        <h3 id="dash-prov" class="text-3xl font-extrabold text-navy">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow border-b-4 border-yellow-500">
+                        <p class="text-xs text-gray-500 font-bold mb-1">Total Mendaftar</p>
+                        <h3 id="dash-daftar" class="text-3xl font-extrabold text-navy">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow border-b-4 border-indigo-500">
+                        <p class="text-xs text-gray-500 font-bold mb-1">Punya KTA</p>
+                        <h3 id="dash-kta" class="text-3xl font-extrabold text-navy">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow border-b-4 border-green-500">
+                        <p class="text-xs text-gray-500 font-bold mb-1">Anggota Aktif</p>
+                        <h3 id="dash-aktif" class="text-3xl font-extrabold text-navy">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow border-b-4 border-red-500">
+                        <p class="text-xs text-gray-500 font-bold mb-1">Tidak Aktif</p>
+                        <h3 id="dash-nonaktif" class="text-3xl font-extrabold text-navy">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow w-full max-w-4xl border border-gray-100">
+                    <h3 class="font-bold text-navy mb-6 text-lg border-b pb-2">Statistik Penyebaran Anggota Nasional</h3>
+                    <canvas id="dashboardChart" style="max-height: 350px;"></canvas>
+                </div>
+            </div>
             
             <div id="menu-provinsi" class="menu-content hidden">
                 <div class="flex flex-col sm:flex-row justify-between mb-4 gap-2"><h2 class="text-2xl font-bold">Daftar Anggota Provinsi</h2><button onclick="openForm('provinsi')" class="bg-green-600 text-white px-3 py-2 sm:py-1 rounded shadow">+ Tambah</button></div>
@@ -285,7 +316,7 @@ input, button, select, textarea {
         // 🔴🔴 MASUKKAN URL WEB APP GAS ANDA DI SINI 🔴🔴
         const GAS_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbxYTW1lnBqRePrL7G6GLHPF7GD2j5MU4GeuWFRK_yNaLoqcsHgwvpYt5M5ZlTcyoiuPIA/exec"; 
         
-        let appDataCache = {}; let cropper = null; let cropperAdm = null; let quillPrivasi = null;
+        let appDataCache = {}; let cropper = null; let cropperAdm = null; let quillPrivasi = null; let dashChart = null;
         let adminProvPage = 1; const adminProvPerPage = 10; let adminProvSearch = '';
         let adminPengurusPage = 1; const adminPengurusPerPage = 10; let adminPengurusSearch = '';
 
@@ -430,6 +461,7 @@ input, button, select, textarea {
                 if(res.success){ 
                     // KARNA HTML SUDAH MENYATU, KITA HANYA PERLU MEMUNCULKANNYA (Tidak perlu fetch lagi)
                     switchView('view-admin'); 
+                    renderDashboard(); // <-- Tambahkan ini
                     
                     // Inisialisasi editor privasi
                     quillPrivasi = new Quill('#editor-privasi', { 
@@ -446,8 +478,16 @@ input, button, select, textarea {
                 Swal.fire('Error', err.message, 'error');
             }
         }
-        
-        function showMenu(id) { document.querySelectorAll('.menu-content').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+
+        function showMenu(id) { 
+    document.querySelectorAll('.menu-content').forEach(el => el.classList.add('hidden')); 
+    document.getElementById(id).classList.remove('hidden'); 
+
+    // Tambahkan logika ini agar saat menu dashboard diklik, data direfresh
+    if (id === 'menu-dashboard') {
+        renderDashboard();
+    }
+}
         
         function refreshAdminData(renderType) { 
             callGAS('getAppData').then(res => {
@@ -496,6 +536,63 @@ input, button, select, textarea {
                     tbody.innerHTML += html;
                 });
             } catch (err) { Swal.fire('Error', 'Error Render Table: ' + err.message, 'error'); }
+        }
+
+        function renderDashboard() {
+            if (!appDataCache || !appDataCache.provinsi) return;
+            
+            let tProv = appDataCache.provinsi.length;
+            let tDaftar = 0, tKTA = 0, tAktif = 0, tTidakAktif = 0;
+            
+            // Kalkulasi ulang semua data provinsi
+            appDataCache.provinsi.forEach(prov => {
+                tDaftar += parseInt(prov.jumlah_daftar) || 0;
+                tKTA += parseInt(prov.jumlah_kta) || 0;
+                tAktif += parseInt(prov.jumlah_aktif) || 0;
+                tTidakAktif += parseInt(prov.jumlah_tidak_aktif) || 0;
+            });
+
+            // Masukkan angka ke kotak statistik (tambahkan toLocaleString agar ada titik ribuannya)
+            document.getElementById('dash-prov').innerText = tProv.toLocaleString('id-ID');
+            document.getElementById('dash-daftar').innerText = tDaftar.toLocaleString('id-ID');
+            document.getElementById('dash-kta').innerText = tKTA.toLocaleString('id-ID');
+            document.getElementById('dash-aktif').innerText = tAktif.toLocaleString('id-ID');
+            document.getElementById('dash-nonaktif').innerText = tTidakAktif.toLocaleString('id-ID');
+
+            // Render Grafik menggunakan Chart.js
+            const ctx = document.getElementById('dashboardChart').getContext('2d');
+            if (dashChart) dashChart.destroy(); // Hapus grafik lama jika sudah ada agar tidak menumpuk
+            
+            dashChart = new Chart(ctx, {
+                type: 'bar', // Bisa diganti 'pie' atau 'line' jika Anda suka
+                data: {
+                    labels: ['Mendaftar', 'Punya KTA', 'Aktif', 'Tidak Aktif'],
+                    datasets: [{
+                        label: 'Jumlah Anggota',
+                        data: [tDaftar, tKTA, tAktif, tTidakAktif],
+                        backgroundColor: [
+                            'rgba(234, 179, 8, 0.8)',   // Kuning
+                            'rgba(99, 102, 241, 0.8)',  // Indigo
+                            'rgba(34, 197, 94, 0.8)',   // Hijau
+                            'rgba(239, 68, 68, 0.8)'    // Merah
+                        ],
+                        borderColor: [
+                            'rgb(202, 138, 4)', 
+                            'rgb(79, 70, 229)', 
+                            'rgb(22, 163, 74)', 
+                            'rgb(220, 38, 38)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 6 // Bikin ujung bar membulat
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }, // Sembunyikan label legend karena sudah jelas
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5] } } } 
+                }
+            });
         }
 
         function openForm(type, id = null) {
