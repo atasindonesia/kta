@@ -380,9 +380,9 @@ input, button, select, textarea {
         }
 
         function showPrivasiModal() {
-            const info = appDataCache.infoUmum || {}; const modal = document.getElementById('modal-global'); modal.classList.remove('hidden'); modal.classList.add('flex'); document.getElementById('modal-title').innerText = "⚖️ Kebijakan Privasi"; document.getElementById('modal-header-actions').innerHTML = '<button onclick="closeModal()" class="text-red-500 font-bold text-xl cursor-pointer">X</button>';
+            const info = appDataCache.infoUmum || {}; const modal = document.getElementById('modal-global'); modal.classList.remove('hidden'); modal.classList.add('flex'); document.getElementById('modal-title').innerText = "⚖️ Kebijakan Privasi (Privacy Policy)"; document.getElementById('modal-header-actions').innerHTML = '<button onclick="closeModal()" class="text-red-500 font-bold text-xl cursor-pointer">X</button>';
             const privasiKonten = info.kebijakan_privasi || '<p class="text-center text-gray-500 mt-10 mb-10">Dokumen Kebijakan Privasi belum ditambahkan oleh Admin.</p>';
-            document.getElementById('modal-body').innerHTML = '<div class="modal-prose text-gray-700 px-2 py-4">' + privasiKonten + '</div><div class="mt-8 text-right border-t pt-4"><button onclick="closeModal()" class="w-full sm:w-auto bg-navy hover:bg-gray-800 text-white font-bold py-2 px-6 rounded shadow transition">Tutup Dokumen</button></div>';
+            document.getElementById('modal-body').innerHTML = '<div class="modal-prose text-gray-700 px-2 py-4">' + privasiKonten + '</div><div class="mt-8 text-right border-t pt-4"><button onclick="closeModal()" class="w-full sm:w-auto bg-navy hover:bg-gray-800 text-white font-bold py-2 px-6 rounded shadow transition">Saya Mengerti</button></div>';
         }
 
         function initPublicView() {
