@@ -1,0 +1,656 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>SAPA KTA ATAS INDONESIA</title>
+    <link rel="icon" type="image/png" href="./logo-kta.png">
+   
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> tailwind.config = { theme: { extend: { colors: { navy: '#0f172a', gold: '#eab308' } } } } </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+
+              /* Mencegah zoom cubitan layar dan efek membal saat mentok */
+html, body {
+    touch-action: pan-y; 
+    overscroll-behavior-y: none; }
+
+/* Mencegah zoom otomatis saat mengklik kolom input / form */
+input, button, select, textarea {
+    touch-action: manipulation; 
+    font-size: 16px !important; }
+
+
+        .card-hover { transition: all 0.3s ease-in-out; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(234, 179, 8, 0.4); border-color: #eab308; }
+        @keyframes bgSlideUp { 0% { background-position: center 100%; opacity: 0.4; } 100% { background-position: center 50%; opacity: 1; } }
+        .animate-bg-slide { animation: bgSlideUp 1s ease-out; background-size: cover; }
+        .yt-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 0.75rem; }
+        .yt-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .foto-pengurus { aspect-ratio: 3/4; object-fit: cover; }
+        
+        .modal-prose h1 { font-size: 1.8em; font-weight: bold; margin-bottom: 0.5em; color: #0f172a; }
+        .modal-prose h2 { font-size: 1.4em; font-weight: bold; margin-bottom: 0.5em; color: #0f172a; }
+        .modal-prose h3 { font-size: 1.2em; font-weight: bold; margin-bottom: 0.5em; color: #0f172a; }
+        .modal-prose p { margin-bottom: 1em; line-height: 1.6; }
+        .modal-prose ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
+        .modal-prose ol { list-style-type: decimal; padding-left: 1.5em; margin-bottom: 1em; }
+        .modal-prose a { color: #2563eb; text-decoration: underline; }
+        .pb-safe { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { 
+            -ms-overflow-style: none; 
+            scrollbar-width: none; 
+            -webkit-overflow-scrolling: touch; 
+            will-change: transform, scroll-position; 
+            transform: translateZ(0); 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans flex flex-col min-h-screen overflow-x-hidden">
+
+    <div id="view-public" class="flex-grow flex flex-col pb-[60px] md:pb-0 relative w-full">
+        <nav class="bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 text-white sticky top-0 z-[70] shadow-md w-full">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-3 w-full md:w-auto overflow-hidden">
+                    <img id="logo" src="" alt="Logo" class="h-10 w-10 object-contain flex-shrink-0">
+                    <span id="nav-title" class="font-bold text-lg md:text-xl text-gold truncate">Aplikasi</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#beranda" class="hover:text-gold transition">Beranda</a>
+                    <a href="#provinsi" class="hover:text-gold transition">Daftar Anggota</a>
+                    <a href="#pengurus-section" class="hover:text-gold transition">Pengurus</a>
+                    <a href="#informasi" class="hover:text-gold transition">Informasi</a>
+                    <button onclick="showAdminPusatModal()" class="hover:text-gold transition font-bold text-cyan-200">Admin Pusat</button>
+                </div>
+            </div>
+        </nav>
+
+        <section id="beranda" class="bg-navy text-white py-32 relative overflow-hidden bg-cover bg-center w-full">
+           <div class="absolute inset-0 bg-black bg-opacity-50 z-0"></div>
+            <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
+                <img id="hero-logo" src="" alt="Logo" class="h-28 md:h-36 mx-auto mb-6 object-contain drop-shadow-2xl hidden">
+                <h1 id="hero-title" class="text-4xl md:text-5xl font-extrabold mb-4 text-gold tracking-wide drop-shadow-lg"></h1>
+                <p id="hero-subtitle" class="text-lg md:text-xl text-gray-200 mb-8 max-w-3xl mx-auto drop-shadow-md"></p>
+            </div>
+        </section>
+
+        <section class="relative z-20 -mt-10 mx-4 md:mx-auto max-w-6xl">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200"><p class="text-sm text-gray-500 font-semibold mb-1">Total Mendaftar</p><p id="stat-daftar" class="text-3xl font-bold text-navy">0</p></div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200"><p class="text-sm text-gray-500 font-semibold mb-1">Punya KTA</p><p id="stat-kta" class="text-3xl font-bold text-blue-600">0</p></div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200"><p class="text-sm text-gray-500 font-semibold mb-1">Anggota Aktif</p><p id="stat-aktif" class="text-3xl font-bold text-green-500">0</p></div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200"><p class="text-sm text-gray-500 font-semibold mb-1">Tidak Aktif</p><p id="stat-tidak-aktif" class="text-3xl font-bold text-red-500">0</p></div>
+            </div>
+        </section>
+
+       <section id="provinsi" class="py-16 max-w-7xl mx-auto px-4 relative z-10 w-full" style="margin-top: 40px !important;">
+            <div class="text-center mb-10 w-full">
+                <h2 class="text-3xl font-bold text-navy border-b-4 border-gold inline-block pb-2">Daftar Anggota Provinsi</h2>
+                <div class="max-w-md mx-auto mt-6 relative">
+                    <input type="text" id="searchInput" onkeyup="filterProvinsi()" placeholder="Cari Nama Provinsi..." class="w-full pl-4 pr-10 py-3 rounded-full border-2 border-gray-200 focus:border-gold outline-none shadow-sm">
+                    <i class="fa-solid fa-search absolute right-4 top-4 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <div class="relative w-full px-12 md:px-14">
+                <button onclick="slideProvinsi(-1)" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gold text-navy w-10 h-10 flex items-center justify-center rounded-full shadow-lg z-20 hover:bg-yellow-500 transition"><i class="fa-solid fa-chevron-left"></i></button>
+                <div id="provinsi-container" class="flex overflow-x-auto gap-4 md:gap-6 snap-x snap-mandatory py-4 hide-scrollbar scroll-smooth w-full"></div>
+                <button onclick="slideProvinsi(1)" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gold text-navy w-10 h-10 flex items-center justify-center rounded-full shadow-lg z-20 hover:bg-yellow-500 transition"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </section>
+
+        <section id="pengurus-section" class="bg-gray-100 py-16 w-full">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="text-center mb-10"><h2 class="text-3xl font-bold text-navy border-b-4 border-gold inline-block pb-2">Pengurus Pusat</h2></div>
+                <div class="relative max-w-5xl mx-auto">
+                    <div id="pengurus-container" class="flex overflow-x-auto gap-4 snap-x snap-mandatory py-4 hide-scrollbar scroll-smooth w-full"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="informasi" class="bg-white py-16 w-full">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="text-center mb-10"><h2 class="text-3xl font-bold text-navy border-b-4 border-gold inline-block pb-2">Informasi</h2></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div class="bg-gray-50 p-8 rounded-xl border border-gray-200 flex flex-col"><h3 class="text-2xl font-bold text-navy mb-4 border-b pb-2">ℹ️ Cara Daftar</h3><div id="yt-wrapper" class="yt-container mb-4 hidden"></div><p id="petunjuk-text" class="text-gray-700 whitespace-pre-line leading-relaxed flex-grow"></p><a id="btn-pdf-petunjuk" href="#" target="_blank" class="mt-4 bg-red-600 text-white text-center font-bold py-2 rounded hover:bg-red-700 hidden">📥 Download PDF Petunjuk</a></div>
+                    <div class="bg-white p-8 rounded-xl border border-gray-200 flex flex-col text-gray-800"><h3 class="text-2xl font-bold text-navy mb-4 border-b border-gray-300 pb-2">⚖️ Dasar Hukum</h3><div id="hukum-container" class="space-y-4"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-gradient-to-r from-blue-900 via-blue-800 to-purple-900 text-white pt-12 pb-6 border-t border-purple-800 w-full">
+            <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div class="flex flex-col items-start space-y-3">
+                    <img id="ft-logo" src="" alt="Logo" class="h-16 w-16 object-contain bg-white p-1 rounded-lg hidden shadow">
+                    <h4 class="text-xl font-bold text-gold" id="ft-org">Nama Organisasi</h4>
+                    <p class="text-gray-400 text-sm font-mono" id="ft-sk">SK Kemenkumham: -</p>
+                    <p class="text-gray-400 text-sm" id="ft-alamat"><i class="fa-solid fa-map-location-dot mr-1 text-gold"></i> Alamat Lengkap</p>
+                </div>
+                <div>
+                    <h4 class="text-xl font-bold text-gold mb-4">Kontak</h4>
+                    <ul class="space-y-4 text-gray-300 text-sm" id="ft-kontak-list"></ul>
+                </div>
+                <div class="md:text-left lg:text-right">
+                    <h4 class="text-xl font-bold text-gold mb-4">Media Sosial</h4>
+                    <ul class="space-y-3 text-gray-300 text-sm flex flex-col items-start lg:items-end" id="sosmed-list"></ul>
+                </div>
+            </div>
+            <div class="text-center text-gray-500 text-sm border-t border-gray-800 pt-6">
+                &copy; 2026 <span id="ft-app">SAPA KTA</span> - All Rights Reserved. | <a href="javascript:void(0)" onclick="showPrivasiModal()" class="hover:text-gold transition border-b border-gray-500 hover:border-gold pb-1">Kebijakan Privasi</a>
+            </div>
+        </footer>
+
+        <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[60] flex justify-between items-center h-[60px] px-2 pb-safe shadow-[0_-5px_15px_rgba(0,0,0,0.08)]">
+            <a href="#beranda" class="flex flex-col items-center justify-center w-16 text-gray-400 hover:text-blue-600 transition">
+                <i class="fa-solid fa-house text-lg mb-0.5"></i><span class="text-[10px] font-medium">Home</span>
+            </a>
+            <a href="#pengurus-section" class="flex flex-col items-center justify-center w-16 text-gray-400 hover:text-blue-600 transition">
+                <i class="fa-solid fa-users text-lg mb-0.5"></i><span class="text-[10px] font-medium">Pengurus</span>
+            </a>
+            <a href="#provinsi" class="flex flex-col items-center justify-center relative -top-4 w-16 text-gray-400 hover:text-blue-600 transition">
+                <div class="bg-gradient-to-tr from-cyan-500 to-blue-600 text-white w-[50px] h-[50px] rounded-full flex items-center justify-center shadow-[0_4px_10px_rgba(6,182,212,0.4)] border-[3px] border-gray-50">
+                    <i class="fa-solid fa-address-card text-xl"></i>
+                </div>
+                <span class="text-[10px] font-bold mt-1 whitespace-nowrap">Daftar KTA</span>
+            </a>
+            <a href="#informasi" class="flex flex-col items-center justify-center w-16 text-gray-400 hover:text-blue-600 transition">
+                <i class="fa-solid fa-circle-info text-lg mb-0.5"></i><span class="text-[10px] font-medium">Informasi</span>
+            </a>
+            <button onclick="showAdminPusatModal()" class="flex flex-col items-center justify-center w-16 text-gray-400 hover:text-blue-600 transition">
+                <i class="fa-solid fa-headset text-lg mb-0.5"></i><span class="text-[10px] font-medium">Admin</span>
+            </button>
+        </div>
+
+        <button id="btn-scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="md:hidden fixed bottom-[75px] left-4 bg-green-500 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center z-[55] opacity-0 transition-opacity duration-300 pointer-events-none border-2 border-white">
+            <i class="fa-solid fa-chevron-up text-xl"></i>
+        </button>
+
+    </div>
+
+    <div id="view-login" class="hidden fixed inset-0 bg-navy flex items-center justify-center z-[100]">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm relative">
+            <button onclick="switchView('view-public')" class="absolute top-4 left-4 text-gray-400 hover:text-red-500 font-bold">← Batal</button>
+            <h2 class="text-3xl font-bold text-center text-navy mt-6 mb-6">Login Admin</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="mb-4"><label class="block text-sm font-bold mb-2">Username</label><input type="text" id="username" class="w-full p-2 border rounded" required></div>
+                <div class="mb-6">
+                    <label class="block text-sm font-bold mb-2">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" class="w-full p-2 border rounded pr-10" required>
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-800"><i id="eye-icon" class="fa-solid fa-eye"></i></button>
+                    </div>
+                </div>
+                <button type="submit" id="btn-login" class="w-full bg-gold text-navy font-bold py-2 rounded cursor-pointer">Masuk</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="view-admin" class="hidden fixed inset-0 bg-gray-100 flex flex-col md:flex-row overflow-hidden z-[100]">
+    </div>
+
+    <div id="modal-global" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[200]">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative m-4">
+            <div class="flex justify-between items-center mb-4 border-b pb-3"><h2 id="modal-title" class="text-2xl font-bold text-navy"></h2><div id="modal-header-actions"><button onclick="closeModal()" class="text-red-500 font-bold text-2xl cursor-pointer">X</button></div></div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // 🔴🔴 MASUKKAN URL WEB APP GAS ANDA DI SINI 🔴🔴
+        const GAS_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbxYTW1lnBqRePrL7G6GLHPF7GD2j5MU4GeuWFRK_yNaLoqcsHgwvpYt5M5ZlTcyoiuPIA/exec"; 
+        
+        let appDataCache = {}; let cropper = null; let cropperAdm = null; let quillPrivasi = null;
+        let adminProvPage = 1; const adminProvPerPage = 10; let adminProvSearch = '';
+        let adminPengurusPage = 1; const adminPengurusPerPage = 10; let adminPengurusSearch = '';
+
+        // Fungsi ajaib pengganti google.script.run
+        async function callGAS(action, payload = {}) {
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: action, payload: payload })
+                });
+                return await response.json();
+            } catch (error) {
+                console.error("GAS Error:", error);
+                throw error;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            Swal.fire({title:'Memuat Data...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}});
+            callGAS('getAppData').then(res => {
+                if(res.success) {
+                    appDataCache = res.appData;
+                    Swal.close();
+                    initPublicView(); 
+                }
+            }).catch(err => {
+                Swal.fire('Error', 'Gagal memuat data dari server database.', 'error');
+            });
+        });
+
+        let isScrolling = false;
+        window.addEventListener('scroll', () => {
+            if (!isScrolling) {
+                window.requestAnimationFrame(() => {
+                    const btnScroll = document.getElementById('btn-scroll-top');
+                    if(btnScroll) {
+                        if (window.scrollY > 300) { 
+                            btnScroll.classList.remove('opacity-0', 'pointer-events-none'); 
+                            btnScroll.classList.add('opacity-100', 'pointer-events-auto'); 
+                        } else { 
+                            btnScroll.classList.add('opacity-0', 'pointer-events-none'); 
+                            btnScroll.classList.remove('opacity-100', 'pointer-events-auto'); 
+                        }
+                    }
+                    isScrolling = false;
+                });
+                isScrolling = true;
+            }
+        }, { passive: true }); 
+
+        function switchView(viewId) { document.getElementById('view-public').classList.add('hidden'); document.getElementById('view-login').classList.add('hidden'); document.getElementById('view-admin').classList.add('hidden'); document.getElementById(viewId).classList.remove('hidden'); if(viewId === 'view-public') initPublicView(); }
+        function handleMobileAdminMenu(val) { if (val === 'logout') { switchView('view-public'); document.getElementById('admin-mobile-menu').value = 'menu-dashboard'; } else { showMenu(val); let type = val.replace('menu-', ''); if (['provinsi', 'pengurus', 'slide', 'hukum'].includes(type)) { renderTable(type); } else if (type === 'petunjuk') { loadPetunjukAdmin(); } else if (type === 'pengaturan') { loadPengaturanAdmin(); } } }
+        function togglePassword() { const pwd = document.getElementById('password'); const icon = document.getElementById('eye-icon'); if (pwd.type === 'password') { pwd.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); } else { pwd.type = 'password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); } }
+
+        function showAdminPusatModal() {
+            const info = appDataCache.infoUmum || {}; const modal = document.getElementById('modal-global'); modal.classList.remove('hidden'); modal.classList.add('flex'); document.getElementById('modal-title').innerText = "Hubungi Admin Pusat"; 
+            const headerActions = document.getElementById('modal-header-actions'); headerActions.innerHTML = '<button onclick="closeModal(); switchView(\'view-login\');" class="text-navy bg-gold px-3 py-1 rounded text-sm font-bold hover:bg-yellow-400 transition cursor-pointer shadow"><i class="fa-solid fa-lock"></i> Admin</button>';
+            let cleanWa = String(info.admin_hp || '').replace(/[^0-9]/g, ''); if(cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.substring(1); let waUrl = cleanWa ? 'https://wa.me/' + cleanWa : '#';
+            document.getElementById('modal-body').innerHTML = '<div class="flex flex-col items-center text-center p-4"><img src="'+(info.admin_foto || 'https://via.placeholder.com/300x400')+'" alt="Admin Pusat" class="w-32 h-40 object-cover rounded-lg shadow-md border-2 border-gold mb-4"><h3 class="text-2xl font-bold text-navy">'+(info.admin_nama || 'Belum ada data')+'</h3><p class="text-gray-500 font-semibold mb-6">'+(info.admin_jabatan || '-')+'</p><div class="w-full space-y-3"><a href="'+waUrl+'" target="_blank" class="flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg shadow transition"><i class="fa-brands fa-whatsapp text-xl"></i> Chat WhatsApp</a><a href="mailto:'+(info.admin_email || '')+'" class="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow transition"><i class="fa-solid fa-envelope text-xl"></i> Kirim Email</a><button onclick="closeModal()" class="w-full mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-lg shadow transition">Tutup</button></div></div>';
+        }
+
+        function showPrivasiModal() {
+            const info = appDataCache.infoUmum || {}; const modal = document.getElementById('modal-global'); modal.classList.remove('hidden'); modal.classList.add('flex'); document.getElementById('modal-title').innerText = "⚖️ Kebijakan Privasi"; document.getElementById('modal-header-actions').innerHTML = '<button onclick="closeModal()" class="text-red-500 font-bold text-xl cursor-pointer">X</button>';
+            const privasiKonten = info.kebijakan_privasi || '<p class="text-center text-gray-500 mt-10 mb-10">Dokumen Kebijakan Privasi belum ditambahkan oleh Admin.</p>';
+            document.getElementById('modal-body').innerHTML = '<div class="modal-prose text-gray-700 px-2 py-4">' + privasiKonten + '</div><div class="mt-8 text-right border-t pt-4"><button onclick="closeModal()" class="w-full sm:w-auto bg-navy hover:bg-gray-800 text-white font-bold py-2 px-6 rounded shadow transition">Tutup Dokumen</button></div>';
+        }
+
+        function initPublicView() {
+            try {
+                if (!appDataCache || Object.keys(appDataCache).length === 0) return; const info = appDataCache.infoUmum || {}; const kontak = appDataCache.kontak || {};
+                document.getElementById('logo').src = info.logo_url || ''; document.getElementById('nav-title').innerText = info.nama_aplikasi || 'SAPA KTA'; document.getElementById('hero-title').innerText = info.nama_organisasi || 'Selamat Datang'; document.getElementById('hero-subtitle').innerText = info.nama_panjang || '';
+                const heroLogo = document.getElementById('hero-logo'); if(info.logo_url) { heroLogo.src = info.logo_url; heroLogo.classList.remove('hidden'); } else { heroLogo.classList.add('hidden'); }
+
+                const ftLogo = document.getElementById('ft-logo'); if(info.logo_url) { ftLogo.src = info.logo_url; ftLogo.classList.remove('hidden'); }
+                document.getElementById('ft-app').innerText = info.nama_aplikasi || 'SAPA KTA'; document.getElementById('ft-org').innerText = info.nama_organisasi || 'Nama Organisasi'; document.getElementById('ft-sk').innerText = info.sk_kemenkumham ? 'SK Kemenkumham: ' + info.sk_kemenkumham : ''; document.getElementById('ft-alamat').innerHTML = kontak.alamat ? '<i class="fa-solid fa-map-location-dot mr-1 text-gold"></i> ' + kontak.alamat : '-';
+                
+                let emailLink = kontak.email ? '<li><a href="mailto:'+kontak.email+'" class="hover:text-gold flex items-center gap-3 transition"><i class="fa-solid fa-envelope text-xl text-gray-300"></i> '+kontak.email+'</a></li>' : '';
+                let waNum = String(kontak.telepon || kontak.whatsapp || '').replace(/[^0-9]/g, ''); if(waNum.startsWith('0')) waNum = '62' + waNum.substring(1);
+                let waLink = waNum ? '<li><a href="https://wa.me/'+waNum+'" target="_blank" class="hover:text-gold flex items-center gap-3 transition"><i class="fa-brands fa-whatsapp text-green-500 text-xl"></i> '+(kontak.telepon || kontak.whatsapp)+'</a></li>' : '';
+                let webLink = kontak.website ? '<li><a href="'+(kontak.website.startsWith('http') ? kontak.website : 'https://'+kontak.website)+'" target="_blank" class="hover:text-gold flex items-center gap-3 transition"><i class="fa-solid fa-globe text-blue-400 text-xl"></i> '+kontak.website+'</a></li>' : '';
+                document.getElementById('ft-kontak-list').innerHTML = emailLink + waLink + webLink || '<li class="text-gray-500">Belum ada kontak</li>';
+
+                const sList = document.getElementById('sosmed-list'); sList.innerHTML = '';
+                const buildSosmed = (val, icon, color) => { if(!val) return ''; let link = val.startsWith('http') ? val : 'https://' + val; let label = val.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]; return '<li><a href="'+link+'" target="_blank" class="hover:text-gold flex items-center gap-3 font-semibold transition"><i class="fa-brands '+icon+' '+color+' text-xl w-5 text-center"></i> '+label+'</a></li>'; };
+                sList.innerHTML += buildSosmed(kontak.ig, 'fa-instagram', 'text-pink-500') + buildSosmed(kontak.fb, 'fa-facebook', 'text-blue-500') + buildSosmed(kontak.x, 'fa-x-twitter', 'text-gray-300') + buildSosmed(kontak.yt, 'fa-youtube', 'text-red-500') + buildSosmed(kontak.tg, 'fa-telegram', 'text-blue-400') + buildSosmed(kontak.tt, 'fa-tiktok', 'text-gray-300');
+                if(sList.innerHTML === '') sList.innerHTML = '<li class="text-gray-600 font-mono">Belum ada akun terhubung</li>';
+
+                const heroSection = document.getElementById('beranda'); let sliderImages = appDataCache.slide ? appDataCache.slide.map(s => s.gambar_url).filter(url => url) : []; if(sliderImages.length === 0) sliderImages = ['https://images.unsplash.com/photo-1577563908411-5077b6dc7624?q=80&w=2070'];
+                heroSection.style.backgroundImage = 'url("'+sliderImages[0]+'")'; heroSection.classList.add('animate-bg-slide');
+                if(window.heroInterval) clearInterval(window.heroInterval); if(sliderImages.length > 1) { let currentSlide = 0; window.heroInterval = setInterval(() => { currentSlide = (currentSlide + 1) % sliderImages.length; heroSection.classList.remove('animate-bg-slide'); void heroSection.offsetWidth; heroSection.classList.add('animate-bg-slide'); heroSection.style.backgroundImage = 'url("'+sliderImages[currentSlide]+'")'; }, 5000); }
+
+                const pengurusContainer = document.getElementById('pengurus-container'); if (pengurusContainer) pengurusContainer.innerHTML = '';
+                if(appDataCache.pengurus && appDataCache.pengurus.length > 0) { 
+                    appDataCache.pengurus.forEach(p => { pengurusContainer.innerHTML += '<div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col items-center flex-shrink-0 snap-center w-[calc(50%-0.5rem)] md:w-[calc(25%-0.75rem)] card-hover"><img src="'+(p.foto_url || 'https://via.placeholder.com/300x400')+'" alt="'+(p.nama || '')+'" class="w-full foto-pengurus"><div class="p-3 text-center w-full bg-navy text-white"><h4 class="font-bold text-sm truncate text-gold">'+(p.nama || '')+'</h4><p class="text-xs text-gray-300 truncate">'+(p.jabatan || '')+'</p></div></div>'; }); 
+                    document.getElementById('pengurus-section').classList.remove('hidden'); 
+                    if(window.pengurusInterval) clearInterval(window.pengurusInterval);
+                    window.pengurusInterval = setInterval(() => { const pContainer = document.getElementById('pengurus-container'); if(!pContainer) return; const maxScroll = pContainer.scrollWidth - pContainer.clientWidth; if(pContainer.scrollLeft >= maxScroll - 10) { pContainer.scrollTo({ left: 0, behavior: 'smooth' }); } else { pContainer.scrollBy({ left: pContainer.clientWidth, behavior: 'smooth' }); } }, 4000);
+                } else { document.getElementById('pengurus-section').classList.add('hidden'); }
+
+                document.getElementById('petunjuk-text').innerText = info.petunjuk_narasi || ''; const ytWrapper = document.getElementById('yt-wrapper');
+                if(info.petunjuk_youtube) { let ytUrl = String(info.petunjuk_youtube); let videoId = ytUrl.split('v=')[1] || ytUrl.split('/').pop(); if(videoId && videoId.indexOf('&') !== -1) videoId = videoId.substring(0, videoId.indexOf('&')); if(videoId) { ytWrapper.innerHTML = '<iframe src="https://www.youtube.com/embed/'+videoId+'" frameborder="0" allowfullscreen></iframe>'; ytWrapper.classList.remove('hidden'); } } else { ytWrapper.classList.add('hidden'); }
+                const btnPdf = document.getElementById('btn-pdf-petunjuk'); if(info.petunjuk_pdf) { btnPdf.href = info.petunjuk_pdf; btnPdf.classList.remove('hidden'); } else { btnPdf.classList.add('hidden'); }
+
+                const hukumContainer = document.getElementById('hukum-container'); if (hukumContainer) hukumContainer.innerHTML = '';
+                if(appDataCache.dasarHukum) { appDataCache.dasarHukum.forEach(item => { let linkHTML = item.file_url ? '<a href="'+item.file_url+'" target="_blank" class="text-green-600 font-bold text-sm mt-2 inline-block"><i class="fa-solid fa-eye"></i> Lihat Dokumen</a>' : ''; hukumContainer.innerHTML += '<div class="bg-white p-4 rounded shadow-sm border-l-4 border-gold border border-gray-200"><h4 class="font-bold text-navy">'+(item.nomor || '')+'</h4><p class="text-gray-600 text-sm">'+(item.tentang || '')+'</p>'+linkHTML+'</div>'; }); }
+
+                const provContainer = document.getElementById('provinsi-container'); if (provContainer) provContainer.innerHTML = ''; let tDaftar = 0, tKTA = 0, tAktif = 0, tTidakAktif = 0;
+                if(appDataCache.provinsi) { 
+                    appDataCache.provinsi.forEach(prov => { 
+                        tDaftar += parseInt(prov.jumlah_daftar) || 0; tKTA += parseInt(prov.jumlah_kta) || 0; tAktif += parseInt(prov.jumlah_aktif) || 0; tTidakAktif += parseInt(prov.jumlah_tidak_aktif) || 0; 
+                        let cleanWa = String(prov.hp_admin || '').replace(/[^0-9]/g, ''); if(cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.substring(1); let waUrl = cleanWa ? 'https://wa.me/' + cleanWa : '#'; let safeNamaProvinsi = String(prov.nama_provinsi || ''); 
+                        provContainer.innerHTML += '<div class="prov-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden card-hover flex flex-col snap-center shrink-0 w-full min-w-full md:w-[320px] md:min-w-[320px] min-h-[250px] box-border" data-nama="'+safeNamaProvinsi.toLowerCase()+'" style="display: flex !important;"><div class="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 p-3"><h3 class="font-bold text-white text-center truncate">'+safeNamaProvinsi+'</h3></div><div class="p-5 flex-grow flex flex-col justify-between space-y-4"><div class="text-sm space-y-3"><div><p class="text-xs text-gray-500 font-bold mb-1">Helpdesk Admin Prov. :</p><p class="font-semibold text-gray-800 flex items-center">👤 '+(prov.nama_admin || '-')+'</p></div><div><p class="text-xs text-gray-500 font-bold mb-1">Kontak (HP/WA) :</p><a href="'+waUrl+'" target="_blank" class="font-semibold text-green-600 flex items-center hover:text-green-700"><i class="fa-brands fa-whatsapp text-green-500 text-xl mr-2"></i> '+(prov.hp_admin || '-')+'</a></div></div><a href="'+(prov.link_pendaftaran || '#')+'" target="_blank" class="block w-full text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-bold py-2 rounded shadow-md hover:opacity-90 transition text-sm">Daftar & Login Anggota</a></div></div>'; 
+                    }); 
+                }
+                document.getElementById('stat-daftar').innerText = tDaftar.toLocaleString('id-ID'); document.getElementById('stat-kta').innerText = tKTA.toLocaleString('id-ID'); document.getElementById('stat-aktif').innerText = tAktif.toLocaleString('id-ID'); document.getElementById('stat-tidak-aktif').innerText = tTidakAktif.toLocaleString('id-ID');
+            } catch (err) { Swal.fire('Error', 'Ada Error Data: ' + err.message, 'error'); }
+        }
+
+        function slideProvinsi(direction) { const container = document.getElementById('provinsi-container'); const scrollAmount = window.innerWidth < 768 ? container.clientWidth : 340; container.scrollBy({ left: scrollAmount * direction, behavior: 'smooth' }); }
+        
+        function filterProvinsi() { 
+            const input = document.getElementById('searchInput').value.toLowerCase(); 
+            document.querySelectorAll('.prov-card').forEach(card => { 
+                if(card.getAttribute('data-nama').includes(input)) { card.style.display = ''; } else { card.style.display = 'none'; } 
+            }); 
+        }
+
+        async function handleLogin(e) { 
+            e.preventDefault(); 
+            const btn = document.getElementById('btn-login'); 
+            btn.innerText = "Memeriksa..."; 
+            
+            try {
+                const res = await callGAS('verifyLogin', {
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                });
+                
+                btn.innerText = "Masuk"; 
+                if(res.success){ 
+                    // PANGGIL AdminPanel.html DARI GITHUB KITA
+                    const adminHtmlRes = await fetch('AdminPanel.html');
+                    const adminHtml = await adminHtmlRes.text();
+                    
+                    document.getElementById('view-admin').innerHTML = adminHtml; 
+                    switchView('view-admin'); 
+                    
+                    quillPrivasi = new Quill('#editor-privasi', { 
+                        theme: 'snow', 
+                        modules: { toolbar: [ [{ 'header': [1, 2, 3, false] }], ['bold', 'italic', 'underline', 'strike'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'color': [] }, { 'background': [] }], ['link', 'clean'] ] }, 
+                        placeholder: 'Ketik Kebijakan Privasi Anda di sini secara lengkap...' 
+                    }); 
+                    Swal.fire({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, icon: 'success', title: 'Login Berhasil'}); 
+                } else { 
+                    Swal.fire('Gagal Login', res.message, 'error'); 
+                }
+            } catch (err) {
+                btn.innerText = "Masuk";
+                Swal.fire('Error', err.message, 'error');
+            }
+        }
+
+        function showMenu(id) { document.querySelectorAll('.menu-content').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+        
+        function refreshAdminData(renderType) { 
+            callGAS('getAppData').then(res => {
+                if(res.success) {
+                    appDataCache = res.appData; 
+                    if(renderType) renderTable(renderType); 
+                }
+            });
+        }
+
+        function filterAdminProv() { adminProvSearch = document.getElementById('adminSearchProv').value.toLowerCase(); adminProvPage = 1; renderTable('provinsi'); }
+        function changeProvPage(page) { adminProvPage = page; renderTable('provinsi'); }
+        function filterAdminPengurus() { adminPengurusSearch = document.getElementById('adminSearchPengurus').value.toLowerCase(); adminPengurusPage = 1; renderTable('pengurus'); }
+        function changePengurusPage(page) { adminPengurusPage = page; renderTable('pengurus'); }
+
+        function renderTable(type) {
+            try {
+                const tbody = document.getElementById('table-'+type); tbody.innerHTML = ''; 
+                let data = (type === 'hukum') ? appDataCache.dasarHukum : appDataCache[type];
+                if(!data) data = [];
+
+                if (type === 'provinsi') {
+                    if (adminProvSearch) data = data.filter(item => String(item.nama_provinsi).toLowerCase().includes(adminProvSearch));
+                    const totalPages = Math.ceil(data.length / adminProvPerPage); const start = (adminProvPage - 1) * adminProvPerPage;
+                    const pageContainer = document.getElementById('pagination-provinsi'); pageContainer.innerHTML = '';
+                    if (totalPages > 1) { pageContainer.classList.remove('hidden'); for (let i = 1; i <= totalPages; i++) { const btnClass = (i === adminProvPage) ? "bg-navy text-white px-3 py-1 rounded" : "bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300"; pageContainer.innerHTML += '<button onclick="changeProvPage('+i+')" class="'+btnClass+'">'+i+'</button>'; } } else { pageContainer.classList.add('hidden'); }
+                    data = data.slice(start, start + adminProvPerPage);
+                }
+
+                if (type === 'pengurus') {
+                    if (adminPengurusSearch) data = data.filter(item => String(item.nama).toLowerCase().includes(adminPengurusSearch) || String(item.jabatan).toLowerCase().includes(adminPengurusSearch));
+                    const totalPages = Math.ceil(data.length / adminPengurusPerPage); const start = (adminPengurusPage - 1) * adminPengurusPerPage;
+                    const pageContainer = document.getElementById('pagination-pengurus'); pageContainer.innerHTML = '';
+                    if (totalPages > 1) { pageContainer.classList.remove('hidden'); for (let i = 1; i <= totalPages; i++) { const btnClass = (i === adminPengurusPage) ? "bg-navy text-white px-3 py-1 rounded" : "bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300"; pageContainer.innerHTML += '<button onclick="changePengurusPage('+i+')" class="'+btnClass+'">'+i+'</button>'; } } else { pageContainer.classList.add('hidden'); }
+                    data = data.slice(start, start + adminPengurusPerPage);
+                }
+
+                if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Data tidak ditemukan.</td></tr>'; return; }
+                
+                data.forEach(item => {
+                    let html = '';
+                    if(type === 'provinsi') { html = '<tr class="border-b hover:bg-gray-50"><td class="p-4 font-bold">'+item.nama_provinsi+'<br><span class="text-xs font-normal text-gray-500">Admin: '+item.nama_admin+'</span></td><td class="p-4 text-xs">Daftar: '+(item.jumlah_daftar||0)+' | Aktif: '+(item.jumlah_aktif||0)+'</td><td class="p-4 text-right whitespace-nowrap"><button onclick="openForm(\'provinsi\', '+item.id+')" class="text-blue-600 mr-2 font-bold">Edit</button><button onclick="delData(\'Provinsi\', '+item.id+')" class="text-red-600 font-bold">Hapus</button></td></tr>'; } 
+                    else if(type === 'slide') { html = '<tr class="border-b hover:bg-gray-50"><td class="p-4 font-bold">'+item.nama_gambar+'</td><td class="p-4"><img src="'+item.gambar_url+'" class="h-10 rounded"></td><td class="p-4 text-right whitespace-nowrap"><button onclick="delData(\'Slide\', '+item.id+')" class="text-red-600 font-bold">Hapus</button></td></tr>'; } 
+                    else if(type === 'hukum') { let viewBtn = item.file_url ? '<a href="'+item.file_url+'" target="_blank" class="text-green-600 mr-4 font-bold hover:text-green-800"><i class="fa-solid fa-eye"></i> Lihat</a>' : ''; html = '<tr class="border-b hover:bg-gray-50"><td class="p-4 font-bold">'+item.nomor+'</td><td class="p-4 text-sm">'+item.tentang+'</td><td class="p-4 text-right whitespace-nowrap">'+viewBtn+'<button onclick="openForm(\'hukum\', '+item.id+')" class="text-blue-600 mr-2 font-bold">Edit</button><button onclick="delData(\'DasarHukum\', '+item.id+')" class="text-red-600 font-bold">Hapus</button></td></tr>'; }
+                    else if(type === 'pengurus') { html = '<tr class="border-b hover:bg-gray-50"><td class="p-4"><img src="'+item.foto_url+'" class="h-12 w-9 object-cover rounded"></td><td class="p-4 font-bold">'+item.nama+'<br><span class="text-xs font-normal text-gray-500">'+item.jabatan+'</span></td><td class="p-4 text-right whitespace-nowrap"><button onclick="openForm(\'pengurus\', '+item.id+')" class="text-blue-600 mr-2 font-bold">Edit</button><button onclick="delData(\'Pengurus\', '+item.id+')" class="text-red-600 font-bold">Hapus</button></td></tr>'; }
+                    tbody.innerHTML += html;
+                });
+            } catch (err) { Swal.fire('Error', 'Error Render Table: ' + err.message, 'error'); }
+        }
+
+        function openForm(type, id = null) {
+            const modal = document.getElementById('modal-global'); modal.classList.remove('hidden'); modal.classList.add('flex');
+            const title = document.getElementById('modal-title'); const body = document.getElementById('modal-body');
+            const headerActions = document.getElementById('modal-header-actions'); headerActions.innerHTML = '<button onclick="closeModal()" class="text-red-500 font-bold text-2xl cursor-pointer">X</button>';
+            let item = id ? (type === 'hukum' ? appDataCache.dasarHukum.find(x => x.id == id) : appDataCache[type].find(x => x.id == id)) : {};
+            if(type === 'provinsi') { title.innerText = id?"Edit Anggota Provinsi":"Tambah Anggota Provinsi"; body.innerHTML = '<form onsubmit="saveProvinsi(event)"><input type="hidden" id="p-id" value="'+(item.id||'')+'"><div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4"><div><label class="text-xs font-bold">Nama Provinsi</label><input type="text" id="p-nama" value="'+(item.nama_provinsi||'')+'" class="w-full border p-2 rounded" required></div><div><label class="text-xs font-bold">Link Pendaftaran</label><input type="url" id="p-link" value="'+(item.link_pendaftaran||'')+'" class="w-full border p-2 rounded" required></div><div><label class="text-xs font-bold">Nama Admin</label><input type="text" id="p-admin" value="'+(item.nama_admin||'')+'" class="w-full border p-2 rounded" required></div><div><label class="text-xs font-bold">HP Admin</label><input type="text" id="p-hp" value="'+(item.hp_admin||'')+'" class="w-full border p-2 rounded" required></div><div><label class="text-xs font-bold">Daftar</label><input type="number" id="p-df" value="'+(item.jumlah_daftar||0)+'" class="w-full border p-2 rounded"></div><div><label class="text-xs font-bold">Aktif</label><input type="number" id="p-ak" value="'+(item.jumlah_aktif||0)+'" class="w-full border p-2 rounded"></div></div><button class="w-full sm:w-auto bg-navy text-white px-4 py-2 rounded font-bold">Simpan Provinsi</button></form>'; } 
+            else if (type === 'slide') { title.innerText = "Tambah Slide (Crop 7:4)"; body.innerHTML = '<form onsubmit="execSaveSlide(event)"><label class="text-sm font-bold">Nama Gambar</label><input type="text" id="s-nama" class="w-full border p-2 mb-2 rounded" required><label class="text-sm font-bold">Pilih File</label><input type="file" id="s-file" accept="image/*" class="w-full border p-2 mb-2 rounded" onchange="initCropper(event, 7/4)" required><div class="w-full max-h-64 overflow-hidden bg-gray-200 mb-2 rounded"><img id="cropper-img" class="max-w-full hidden"></div><button type="submit" id="btn-s-save" class="w-full sm:w-auto bg-navy text-white px-4 py-2 rounded font-bold">Crop & Upload</button></form>'; }
+            else if (type === 'pengurus') { title.innerText = id ? "Edit Pengurus (Crop 3:4)" : "Tambah Pengurus (Crop 3:4)"; body.innerHTML = '<form onsubmit="execSavePengurus(event)"><input type="hidden" id="pe-id" value="'+(item.id||'')+'"><input type="hidden" id="pe-url-lama" value="'+(item.foto_url||'')+'"><label class="text-sm font-bold">Nama</label><input type="text" id="pe-nama" value="'+(item.nama||'')+'" class="w-full border p-2 mb-2 rounded" required><label class="text-sm font-bold">Jabatan</label><input type="text" id="pe-jabatan" value="'+(item.jabatan||'')+'" class="w-full border p-2 mb-2 rounded" required><label class="text-sm font-bold">Upload Foto Baru (Opsional)</label><input type="file" accept="image/*" class="w-full border p-2 mb-2 rounded" onchange="initCropper(event, 3/4)"><div class="w-full max-h-64 overflow-hidden bg-gray-200 mb-2 rounded"><img id="cropper-img" class="max-w-full hidden"></div><button type="submit" id="btn-pe-save" class="w-full sm:w-auto bg-navy text-white px-4 py-2 rounded font-bold">Simpan Data</button></form>'; }
+            else if (type === 'hukum') { title.innerText = id ? "Edit Dasar Hukum" : "Tambah Dasar Hukum"; body.innerHTML = '<form onsubmit="execSaveHukum(event)"><input type="hidden" id="h-id" value="'+(item.id||'')+'"><input type="hidden" id="h-url-lama" value="'+(item.file_url||'')+'"><label class="text-sm font-bold">Nomor Hukum</label><input type="text" id="h-nomor" value="'+(item.nomor||'')+'" class="w-full border p-2 mb-2 rounded" required><label class="text-sm font-bold">Tentang</label><input type="text" id="h-tentang" value="'+(item.tentang||'')+'" class="w-full border p-2 mb-2 rounded" required><label class="text-sm font-bold">Upload PDF (Opsional)</label><input type="file" id="h-file" accept=".pdf" class="w-full border p-2 mb-2 rounded"><button type="submit" id="btn-h-save" class="w-full sm:w-auto bg-navy text-white px-4 py-2 rounded font-bold">Simpan</button></form>'; }
+        }
+
+        function closeModal() { document.getElementById('modal-global').classList.add('hidden'); document.getElementById('modal-global').classList.remove('flex'); if(cropper) { cropper.destroy(); cropper = null; } }
+        function initCropper(e, rasio) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (evt) => { const img = document.getElementById('cropper-img'); img.src = evt.target.result; img.classList.remove('hidden'); if(cropper) cropper.destroy(); cropper = new Cropper(img, { aspectRatio: rasio, viewMode: 1, autoCropArea: 1 }); }; reader.readAsDataURL(file); }
+        function initCropperAdm(e, rasio) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (evt) => { const img = document.getElementById('cropper-img-adm'); img.src = evt.target.result; img.classList.remove('hidden'); if(cropperAdm) cropperAdm.destroy(); cropperAdm = new Cropper(img, { aspectRatio: rasio, viewMode: 1, autoCropArea: 1 }); }; reader.readAsDataURL(file); }
+        
+        async function saveProvinsi(e) { 
+            e.preventDefault(); 
+            const data = { id: document.getElementById('p-id').value, nama_provinsi: document.getElementById('p-nama').value, link_pendaftaran: document.getElementById('p-link').value, nama_admin: document.getElementById('p-admin').value, hp_admin: document.getElementById('p-hp').value, jumlah_daftar: document.getElementById('p-df').value, jumlah_aktif: document.getElementById('p-ak').value }; 
+            try {
+                await callGAS('saveProvinsi', data);
+                closeModal(); 
+                refreshAdminData('provinsi'); 
+                Swal.fire({toast:true, position:'top-end', showConfirmButton:false, timer:3000, icon:'success', title:'Data Tersimpan'});
+            } catch (err) {
+                Swal.fire('Error', err.message, 'error');
+            }
+        }
+
+        async function execSaveSlide(e) { 
+            e.preventDefault(); 
+            const btn = document.getElementById('btn-s-save'); 
+            if(!cropper) return Swal.fire('Peringatan', 'Pilih gambar terlebih dahulu!', 'warning'); 
+            btn.disabled = true; 
+            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            const base64Data = cropper.getCroppedCanvas({width: 1400, height: 800}).toDataURL('image/jpeg', 0.8); 
+            const nama = document.getElementById('s-nama').value; 
+            
+            try {
+                const res = await callGAS('prosesSimpanSlide', { data: {id: null, nama_gambar: nama}, base64Data: base64Data });
+                if(res.success){ 
+                    appDataCache.slide = res.updatedList; 
+                    renderTable('slide'); 
+                    closeModal(); 
+                    Swal.fire('Berhasil', 'Slide Tersimpan', 'success'); 
+                } else { 
+                    Swal.fire('Gagal', res.error, 'error'); 
+                    btn.disabled = false; 
+                }
+            } catch(err) {
+                Swal.fire('Error', err.message, 'error'); 
+                btn.disabled = false; 
+            }
+        }
+
+        async function execSavePengurus(e) { 
+            e.preventDefault(); 
+            const btn = document.getElementById('btn-pe-save'); 
+            const data = { id: document.getElementById('pe-id').value, nama: document.getElementById('pe-nama').value, jabatan: document.getElementById('pe-jabatan').value, foto_url: document.getElementById('pe-url-lama').value }; 
+            btn.disabled = true; 
+            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            let base64Data = null; 
+            if (cropper) { base64Data = cropper.getCroppedCanvas({width: 600, height: 800}).toDataURL('image/jpeg', 0.8); } 
+            
+            try {
+                const res = await callGAS('prosesSimpanPengurus', { data: data, base64Data: base64Data });
+                if(res.success) { 
+                    appDataCache.pengurus = res.updatedList; 
+                    renderTable('pengurus'); 
+                    closeModal(); 
+                    Swal.fire('Berhasil', 'Pengurus Tersimpan', 'success'); 
+                } else { 
+                    Swal.fire('Gagal', res.error, 'error'); 
+                    btn.disabled = false; 
+                }
+            } catch(err) {
+                Swal.fire('Error', err.message, 'error'); 
+                btn.disabled = false;
+            }
+        }
+
+        async function execSaveHukum(e) { 
+            e.preventDefault(); 
+            const btn = document.getElementById('btn-h-save'); 
+            const fileInput = document.getElementById('h-file'); 
+            const data = { id: document.getElementById('h-id').value, nomor: document.getElementById('h-nomor').value, tentang: document.getElementById('h-tentang').value, file_url: document.getElementById('h-url-lama').value }; 
+            btn.disabled = true; 
+            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            
+            try {
+                if (fileInput.files.length > 0) { 
+                    const base64 = await getBase64(fileInput.files[0]); 
+                    const resUpload = await callGAS('uploadFileToDrive', { base64Data: base64, fileName: fileInput.files[0].name });
+                    if(resUpload.success) { 
+                        data.file_url = resUpload.url; 
+                        await callGAS('saveDasarHukum', data);
+                        closeModal(); 
+                        refreshAdminData('hukum'); 
+                        Swal.fire('Berhasil', 'Data Tersimpan', 'success');
+                    } else { 
+                        Swal.fire('Gagal', resUpload.error, 'error'); 
+                        btn.disabled = false; 
+                    } 
+                } else { 
+                    await callGAS('saveDasarHukum', data);
+                    closeModal(); 
+                    refreshAdminData('hukum'); 
+                    Swal.fire('Berhasil', 'Data Tersimpan', 'success');
+                }
+            } catch(err) {
+                Swal.fire('Error', err.message, 'error'); 
+                btn.disabled = false;
+            }
+        }
+        
+        function delData(funcName, id) { 
+            Swal.fire({ title: 'Yakin hapus data ini?', text: "Tindakan ini tidak dapat dibatalkan!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal' }).then(async (result) => { 
+                if (result.isConfirmed) { 
+                    let type = funcName === 'DasarHukum' ? 'hukum' : funcName.toLowerCase(); 
+                    Swal.fire({title:'Menghapus...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}});
+                    try {
+                        await callGAS('delete' + funcName, id);
+                        refreshAdminData(type); 
+                        Swal.fire('Terhapus!', 'Data berhasil dihapus.', 'success'); 
+                    } catch (err) {
+                        Swal.fire('Error', err.message, 'error');
+                    }
+                } 
+            }); 
+        }
+        
+        function loadPengaturanAdmin() { document.getElementById('set-app').value = appDataCache.infoUmum.nama_aplikasi || ''; document.getElementById('set-org').value = appDataCache.infoUmum.nama_organisasi || ''; document.getElementById('set-panjang').value = appDataCache.infoUmum.nama_panjang || ''; document.getElementById('set-sk').value = appDataCache.infoUmum.sk_kemenkumham || ''; document.getElementById('set-web').value = appDataCache.kontak.website || ''; document.getElementById('set-email').value = appDataCache.kontak.email || ''; document.getElementById('set-hp').value = appDataCache.kontak.telepon || appDataCache.kontak.whatsapp || ''; document.getElementById('set-alamat').value = appDataCache.kontak.alamat || ''; document.getElementById('set-ig').value = appDataCache.kontak.ig || ''; document.getElementById('set-fb').value = appDataCache.kontak.fb || ''; document.getElementById('set-x').value = appDataCache.kontak.x || ''; document.getElementById('set-yt').value = appDataCache.kontak.yt || ''; document.getElementById('set-tg').value = appDataCache.kontak.tg || ''; document.getElementById('set-tt').value = appDataCache.kontak.tt || ''; quillPrivasi.root.innerHTML = appDataCache.infoUmum.kebijakan_privasi || ''; }
+        
+        async function savePengaturanUmum(e) { 
+            e.preventDefault(); 
+            const btn = document.getElementById('btn-save-pengaturan'); 
+            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            const htmlPrivasi = quillPrivasi.root.innerHTML; 
+            const data = { nama_aplikasi: document.getElementById('set-app').value, nama_organisasi: document.getElementById('set-org').value, nama_panjang: document.getElementById('set-panjang').value, sk_kemenkumham: document.getElementById('set-sk').value, website: document.getElementById('set-web').value, email: document.getElementById('set-email').value, telepon: document.getElementById('set-hp').value, alamat: document.getElementById('set-alamat').value, ig: document.getElementById('set-ig').value, fb: document.getElementById('set-fb').value, x: document.getElementById('set-x').value, yt: document.getElementById('set-yt').value, tg: document.getElementById('set-tg').value, tt: document.getElementById('set-tt').value, kebijakan_privasi: htmlPrivasi }; 
+            const fileLogo = document.getElementById('set-logo'); 
+            
+            try {
+                if(fileLogo.files.length > 0) { 
+                    const b64 = await getBase64(fileLogo.files[0]); 
+                    const resUpload = await callGAS('uploadFileToDrive', { base64Data: b64, fileName: 'Logo_Baru.png' });
+                    if(resUpload.success) { 
+                        data.logo_url = resUpload.url; 
+                        execSavePengaturan(data, btn); 
+                    } else { 
+                        Swal.fire('Gagal', resUpload.error, 'error'); 
+                    } 
+                } else { 
+                    execSavePengaturan(data, btn); 
+                }
+            } catch (err) {
+                Swal.fire('Error', err.message, 'error');
+            }
+        }
+
+        async function execSavePengaturan(data, btn) { 
+            try {
+                const res = await callGAS('savePengaturan', data);
+                Swal.fire('Berhasil', res.message || 'Tersimpan!', 'success'); 
+                refreshAdminData(null); 
+            } catch (err) {
+                Swal.fire('Error', err.message, 'error');
+            }
+        }
+        
+        function loadPetunjukAdmin() { document.getElementById('ptj-narasi').value = appDataCache.infoUmum.petunjuk_narasi || ''; document.getElementById('ptj-yt').value = appDataCache.infoUmum.petunjuk_youtube || ''; document.getElementById('adm-nama').value = appDataCache.infoUmum.admin_nama || ''; document.getElementById('adm-jabatan').value = appDataCache.infoUmum.admin_jabatan || ''; document.getElementById('adm-hp').value = appDataCache.infoUmum.admin_hp || ''; document.getElementById('adm-email').value = appDataCache.infoUmum.admin_email || ''; }
+        
+        async function handleSavePetunjuk(e) { 
+            e.preventDefault(); 
+            const btn = document.getElementById('btn-save-ptj'); 
+            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            const fileInput = document.getElementById('ptj-pdf'); 
+            const narasi = document.getElementById('ptj-narasi').value; 
+            const yt = document.getElementById('ptj-yt').value; 
+            
+            try {
+                if (fileInput.files.length > 0) { 
+                    const base64 = await getBase64(fileInput.files[0]); 
+                    const resUpload = await callGAS('uploadFileToDrive', { base64Data: base64, fileName: fileInput.files[0].name });
+                    if(resUpload.success) { 
+                        await callGAS('savePetunjuk', { narasi: narasi, ytUrl: yt, pdfUrl: resUpload.url });
+                        Swal.fire('Berhasil','Tersimpan!','success'); 
+                        refreshAdminData(null);
+                    } else { 
+                        Swal.fire('Gagal', resUpload.error, 'error'); 
+                    } 
+                } else { 
+                    await callGAS('savePetunjuk', { narasi: narasi, ytUrl: yt, pdfUrl: null });
+                    Swal.fire('Berhasil','Tersimpan!','success'); 
+                    refreshAdminData(null);
+                }
+            } catch(err) {
+                Swal.fire('Error', err.message, 'error'); 
+            }
+        }
+        
+        async function execSaveAdminPusat(e) { 
+            e.preventDefault(); 
+            const btn = document.getElementById('btn-save-adm'); 
+            const data = { admin_nama: document.getElementById('adm-nama').value, admin_jabatan: document.getElementById('adm-jabatan').value, admin_hp: document.getElementById('adm-hp').value, admin_email: document.getElementById('adm-email').value }; 
+            btn.disabled = true; 
+            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            let base64Data = null; 
+            if (cropperAdm) { base64Data = cropperAdm.getCroppedCanvas({width: 600, height: 800}).toDataURL('image/jpeg', 0.8); } 
+            
+            try {
+                const res = await callGAS('prosesSimpanAdminPusat', { data: data, base64Data: base64Data });
+                if(res.success) { 
+                    appDataCache = res.appData; 
+                    Swal.fire('Berhasil', 'Data Admin Pusat Tersimpan!', 'success'); 
+                    btn.disabled = false; 
+                } else { 
+                    Swal.fire('Gagal', res.error, 'error'); 
+                    btn.disabled = false; 
+                }
+            } catch (err) {
+                Swal.fire('Error', err.message, 'error'); 
+                btn.disabled = false; 
+            }
+        }
+
+        function getBase64(file) { return new Promise((res, rej) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload=()=>res(reader.result); reader.onerror=e=>rej(e); }); }
+    </script>
+</body>
+</html>
