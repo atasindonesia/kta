@@ -315,11 +315,40 @@ input, button, select, textarea {
 
     <script>
         // 🔴🔴 MASUKKAN URL WEB APP GAS ANDA DI SINI 🔴🔴
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbw_lZafUmNxqQSQw834i-Nvx5uZy4FWfTzh3_l6I9-wNhbvZLuJoS-vlOQReBx6c4m77Q/exec"; 
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbw_lZafUmNxqQSQw834i-Nvx5uZy4FWfTzh3_l6I9-wNhbvZLuJoS-vlOQReBx6c4m77Q/exec";  
         
         let appDataCache = {}; let cropper = null; let cropperAdm = null; let quillPrivasi = null; let dashChart = null;
         let adminProvPage = 1; const adminProvPerPage = 10; let adminProvSearch = '';
         let adminPengurusPage = 1; const adminPengurusPerPage = 10; let adminPengurusSearch = '';
+
+        // ==========================================
+        // FUNGSI ANIMASI LOADING HITUNG MUNDUR (5 DETIK)
+        // ==========================================
+        let loadingTimerInterval;
+        function showLoadingAnim(text) {
+            let counter = 5;
+            Swal.fire({
+                title: text + ' (' + counter + ' detik)',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    const titleElement = Swal.getTitle();
+                    loadingTimerInterval = setInterval(() => {
+                        counter--;
+                        if (counter > 0) {
+                            titleElement.textContent = text + ' (' + counter + ' detik)';
+                        } else {
+                            titleElement.textContent = 'Sedang memproses, mohon tunggu...';
+                            clearInterval(loadingTimerInterval);
+                        }
+                    }, 1000);
+                },
+                willClose: () => {
+                    clearInterval(loadingTimerInterval);
+                }
+            });
+        }
 
         // Fungsi ajaib pengganti google.script.run
         async function callGAS(action, payload = {}) {
@@ -337,7 +366,7 @@ input, button, select, textarea {
         }
 
         document.addEventListener('DOMContentLoaded', () => { 
-            Swal.fire({title:'Memuat Data...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}});
+            showLoadingAnim('Memuat Data Sistem');
             callGAS('getAppData').then(res => {
                 if(res.success) {
                     appDataCache = res.appData;
@@ -430,6 +459,14 @@ input, button, select, textarea {
                     appDataCache.provinsi.forEach(prov => { 
                         tDaftar += parseInt(prov.jumlah_daftar) || 0; tKTA += parseInt(prov.jumlah_kta) || 0; tAktif += parseInt(prov.jumlah_aktif) || 0; tTidakAktif += parseInt(prov.jumlah_tidak_aktif) || 0; 
                         let cleanWa = String(prov.hp_admin || '').replace(/[^0-9]/g, ''); if(cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.substring(1); let waUrl = cleanWa ? 'https://wa.me/' + cleanWa : '#'; let safeNamaProvinsi = String(prov.nama_provinsi || ''); 
+                        
+                        // KODE YANG SUDAH DITAMBAHKAN REL NOOPENER NOREFERRER AGAR KLIK INSTAN
+                        provContainer.innerHTML += '<div class="prov-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden card-hover flex flex-col snap-center shrink-0 w-full min-w-full md:w-[320px] md:min-w-[320px] min-h-[250px] box-border" data-nama="'+safeNamaProvinsi.toLowerCase()+'" style="display: flex !important;"><div class="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 p-3"><h3 class="font-bold text-white text-center truncate">'+safeNamaProvinsi+'</h3></div><div class="p-5 flex-grow flex flex-col justify-between space-y-4"><div class="text-sm space-y-3"><div><p class="text-xs text-gray-500 font-bold mb-1">Helpdesk Admin Prov. :</p><p class="font-semibold text-gray-800 flex items-center">👤 '+(prov.nama_admin || '-')+'</p></div><div><p class="text-xs text-gray-500 font-bold mb-1">Kontak (HP/WA) :</p><a href="'+waUrl+'" target="_blank" rel="noopener noreferrer" class="font-semibold text-green-600 flex items-center hover:text-green-700"><i class="fa-brands fa-whatsapp text-green-500 text-xl mr-2"></i> '+(prov.hp_admin || '-')+'</a></div></div><a href="'+(prov.link_pendaftaran || '#')+'" target="_blank" rel="noopener noreferrer" class="block w-full text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-bold py-2 rounded shadow-md hover:opacity-90 transition text-sm">Daftar & Login Anggota</a></div></div>'; 
+                    }); 
+                }
+
+
+
                         provContainer.innerHTML += '<div class="prov-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden card-hover flex flex-col snap-center shrink-0 w-full min-w-full md:w-[320px] md:min-w-[320px] min-h-[250px] box-border" data-nama="'+safeNamaProvinsi.toLowerCase()+'" style="display: flex !important;"><div class="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 p-3"><h3 class="font-bold text-white text-center truncate">'+safeNamaProvinsi+'</h3></div><div class="p-5 flex-grow flex flex-col justify-between space-y-4"><div class="text-sm space-y-3"><div><p class="text-xs text-gray-500 font-bold mb-1">Helpdesk Admin Prov. :</p><p class="font-semibold text-gray-800 flex items-center">👤 '+(prov.nama_admin || '-')+'</p></div><div><p class="text-xs text-gray-500 font-bold mb-1">Kontak (HP/WA) :</p><a href="'+waUrl+'" target="_blank" class="font-semibold text-green-600 flex items-center hover:text-green-700"><i class="fa-brands fa-whatsapp text-green-500 text-xl mr-2"></i> '+(prov.hp_admin || '-')+'</a></div></div><a href="'+(prov.link_pendaftaran || '#')+'" target="_blank" class="block w-full text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-bold py-2 rounded shadow-md hover:opacity-90 transition text-sm">Daftar & Login Anggota</a></div></div>'; 
                     }); 
                 }
@@ -450,9 +487,9 @@ input, button, select, textarea {
             e.preventDefault(); 
             const btn = document.getElementById('btn-login'); 
             btn.innerText = "Memeriksa..."; 
+            showLoadingAnim('Memeriksa Kredensial Admin');
             
             try {
-                // Memeriksa kebenaran user dan password ke GAS
                 const res = await callGAS('verifyLogin', {
                     username: document.getElementById('username').value,
                     password: document.getElementById('password').value
@@ -460,26 +497,24 @@ input, button, select, textarea {
                 
                 btn.innerText = "Masuk"; 
                 if(res.success){ 
-                    // KARNA HTML SUDAH MENYATU, KITA HANYA PERLU MEMUNCULKANNYA (Tidak perlu fetch lagi)
                     switchView('view-admin'); 
-                    renderDashboard(); // <-- Tambahkan ini
+                    renderDashboard(); // Render Grafik Dashboard
                     
-                    // Inisialisasi editor privasi (FULL FEATURES)
                     quillPrivasi = new Quill('#editor-privasi', { 
                         theme: 'snow', 
                         modules: { 
                             toolbar: [ 
-                                [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }], // Pilihan Font & Ukuran
-                                [{ 'header': [1, 2, 3, 4, 5, 6, false] }], // Heading lengkap
-                                ['bold', 'italic', 'underline', 'strike'], // Format teks
-                                [{ 'color': [] }, { 'background': [] }], // Warna teks & background
-                                [{ 'script': 'sub'}, { 'script': 'super' }], // Subscript/Superscript
-                                [{ 'list': 'ordered'}, { 'list': 'bullet' }], // List angka & titik
-                                [{ 'indent': '-1'}, { 'indent': '+1' }], // Geser teks (Indent)
-                                [{ 'align': [] }], // RATA TEKS (Kiri, Tengah, Kanan, Justify)
-                                ['blockquote', 'code-block'], // Kutipan & Kode
-                                ['link', 'image', 'video'], // Masukkan Link, Gambar, Video
-                                ['clean'] // Tombol hapus semua format
+                                [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }], 
+                                [{ 'header': [1, 2, 3, 4, 5, 6, false] }], 
+                                ['bold', 'italic', 'underline', 'strike'], 
+                                [{ 'color': [] }, { 'background': [] }], 
+                                [{ 'script': 'sub'}, { 'script': 'super' }], 
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }], 
+                                [{ 'indent': '-1'}, { 'indent': '+1' }], 
+                                [{ 'align': [] }], 
+                                ['blockquote', 'code-block'], 
+                                ['link', 'image', 'video'], 
+                                ['clean'] 
                             ] 
                         }, 
                         placeholder: 'Ketik Kebijakan Privasi Anda di sini secara lengkap dengan rapi...' 
@@ -494,15 +529,55 @@ input, button, select, textarea {
             }
         }
 
-        function showMenu(id) { 
-    document.querySelectorAll('.menu-content').forEach(el => el.classList.add('hidden')); 
-    document.getElementById(id).classList.remove('hidden'); 
+        // FUNGSI RENDER DASHBOARD & GRAFIK
+        function renderDashboard() {
+            if (!appDataCache || !appDataCache.provinsi) return;
+            
+            let tProv = appDataCache.provinsi.length;
+            let tDaftar = 0, tKTA = 0, tAktif = 0, tTidakAktif = 0;
+            
+            appDataCache.provinsi.forEach(prov => {
+                tDaftar += parseInt(prov.jumlah_daftar) || 0;
+                tKTA += parseInt(prov.jumlah_kta) || 0;
+                tAktif += parseInt(prov.jumlah_aktif) || 0;
+                tTidakAktif += parseInt(prov.jumlah_tidak_aktif) || 0;
+            });
 
-    // Tambahkan logika ini agar saat menu dashboard diklik, data direfresh
-    if (id === 'menu-dashboard') {
-        renderDashboard();
-    }
-}
+            document.getElementById('dash-prov').innerText = tProv.toLocaleString('id-ID');
+            document.getElementById('dash-daftar').innerText = tDaftar.toLocaleString('id-ID');
+            document.getElementById('dash-kta').innerText = tKTA.toLocaleString('id-ID');
+            document.getElementById('dash-aktif').innerText = tAktif.toLocaleString('id-ID');
+            document.getElementById('dash-nonaktif').innerText = tTidakAktif.toLocaleString('id-ID');
+
+            const ctx = document.getElementById('dashboardChart');
+            if (!ctx) return; // Mencegah error jika canvas tidak ditemukan
+            const context2d = ctx.getContext('2d');
+            
+            if (dashChart) dashChart.destroy(); 
+            
+            if (typeof Chart !== 'undefined') {
+                dashChart = new Chart(context2d, {
+                    type: 'bar', 
+                    data: {
+                        labels: ['Mendaftar', 'Punya KTA', 'Aktif', 'Tidak Aktif'],
+                        datasets: [{
+                            label: 'Jumlah Anggota',
+                            data: [tDaftar, tKTA, tAktif, tTidakAktif],
+                            backgroundColor: ['rgba(234, 179, 8, 0.8)', 'rgba(99, 102, 241, 0.8)', 'rgba(34, 197, 94, 0.8)', 'rgba(239, 68, 68, 0.8)'],
+                            borderColor: ['rgb(202, 138, 4)', 'rgb(79, 70, 229)', 'rgb(22, 163, 74)', 'rgb(220, 38, 38)'],
+                            borderWidth: 1, borderRadius: 6
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5] } } } }
+                });
+            }
+        }
+
+        function showMenu(id) { 
+            document.querySelectorAll('.menu-content').forEach(el => el.classList.add('hidden')); 
+            document.getElementById(id).classList.remove('hidden'); 
+            if (id === 'menu-dashboard') { renderDashboard(); }
+        }
         
         function refreshAdminData(renderType) { 
             callGAS('getAppData').then(res => {
@@ -553,63 +628,6 @@ input, button, select, textarea {
             } catch (err) { Swal.fire('Error', 'Error Render Table: ' + err.message, 'error'); }
         }
 
-        function renderDashboard() {
-            if (!appDataCache || !appDataCache.provinsi) return;
-            
-            let tProv = appDataCache.provinsi.length;
-            let tDaftar = 0, tKTA = 0, tAktif = 0, tTidakAktif = 0;
-            
-            // Kalkulasi ulang semua data provinsi
-            appDataCache.provinsi.forEach(prov => {
-                tDaftar += parseInt(prov.jumlah_daftar) || 0;
-                tKTA += parseInt(prov.jumlah_kta) || 0;
-                tAktif += parseInt(prov.jumlah_aktif) || 0;
-                tTidakAktif += parseInt(prov.jumlah_tidak_aktif) || 0;
-            });
-
-            // Masukkan angka ke kotak statistik (tambahkan toLocaleString agar ada titik ribuannya)
-            document.getElementById('dash-prov').innerText = tProv.toLocaleString('id-ID');
-            document.getElementById('dash-daftar').innerText = tDaftar.toLocaleString('id-ID');
-            document.getElementById('dash-kta').innerText = tKTA.toLocaleString('id-ID');
-            document.getElementById('dash-aktif').innerText = tAktif.toLocaleString('id-ID');
-            document.getElementById('dash-nonaktif').innerText = tTidakAktif.toLocaleString('id-ID');
-
-            // Render Grafik menggunakan Chart.js
-            const ctx = document.getElementById('dashboardChart').getContext('2d');
-            if (dashChart) dashChart.destroy(); // Hapus grafik lama jika sudah ada agar tidak menumpuk
-            
-            dashChart = new Chart(ctx, {
-                type: 'bar', // Bisa diganti 'pie' atau 'line' jika Anda suka
-                data: {
-                    labels: ['Mendaftar', 'Punya KTA', 'Aktif', 'Tidak Aktif'],
-                    datasets: [{
-                        label: 'Jumlah Anggota',
-                        data: [tDaftar, tKTA, tAktif, tTidakAktif],
-                        backgroundColor: [
-                            'rgba(234, 179, 8, 0.8)',   // Kuning
-                            'rgba(99, 102, 241, 0.8)',  // Indigo
-                            'rgba(34, 197, 94, 0.8)',   // Hijau
-                            'rgba(239, 68, 68, 0.8)'    // Merah
-                        ],
-                        borderColor: [
-                            'rgb(202, 138, 4)', 
-                            'rgb(79, 70, 229)', 
-                            'rgb(22, 163, 74)', 
-                            'rgb(220, 38, 38)'
-                        ],
-                        borderWidth: 1,
-                        borderRadius: 6 // Bikin ujung bar membulat
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }, // Sembunyikan label legend karena sudah jelas
-                    scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5] } } } 
-                }
-            });
-        }
-
         function openForm(type, id = null) {
             const modal = document.getElementById('modal-global'); modal.classList.remove('hidden'); modal.classList.add('flex');
             const title = document.getElementById('modal-title'); const body = document.getElementById('modal-body');
@@ -629,6 +647,7 @@ input, button, select, textarea {
             e.preventDefault(); 
             const data = { id: document.getElementById('p-id').value, nama_provinsi: document.getElementById('p-nama').value, link_pendaftaran: document.getElementById('p-link').value, nama_admin: document.getElementById('p-admin').value, hp_admin: document.getElementById('p-hp').value, jumlah_daftar: document.getElementById('p-df').value, jumlah_aktif: document.getElementById('p-ak').value }; 
             try {
+                showLoadingAnim('Menyimpan Data Provinsi');
                 await callGAS('saveProvinsi', data);
                 closeModal(); 
                 refreshAdminData('provinsi'); 
@@ -643,7 +662,7 @@ input, button, select, textarea {
             const btn = document.getElementById('btn-s-save'); 
             if(!cropper) return Swal.fire('Peringatan', 'Pilih gambar terlebih dahulu!', 'warning'); 
             btn.disabled = true; 
-            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            showLoadingAnim('Mengunggah Slide');
             const base64Data = cropper.getCroppedCanvas({width: 1400, height: 800}).toDataURL('image/jpeg', 0.8); 
             const nama = document.getElementById('s-nama').value; 
             
@@ -669,7 +688,7 @@ input, button, select, textarea {
             const btn = document.getElementById('btn-pe-save'); 
             const data = { id: document.getElementById('pe-id').value, nama: document.getElementById('pe-nama').value, jabatan: document.getElementById('pe-jabatan').value, foto_url: document.getElementById('pe-url-lama').value }; 
             btn.disabled = true; 
-            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            showLoadingAnim('Menyimpan Data Pengurus');
             let base64Data = null; 
             if (cropper) { base64Data = cropper.getCroppedCanvas({width: 600, height: 800}).toDataURL('image/jpeg', 0.8); } 
             
@@ -696,7 +715,7 @@ input, button, select, textarea {
             const fileInput = document.getElementById('h-file'); 
             const data = { id: document.getElementById('h-id').value, nomor: document.getElementById('h-nomor').value, tentang: document.getElementById('h-tentang').value, file_url: document.getElementById('h-url-lama').value }; 
             btn.disabled = true; 
-            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            showLoadingAnim('Menyimpan Dasar Hukum');
             
             try {
                 if (fileInput.files.length > 0) { 
@@ -728,7 +747,7 @@ input, button, select, textarea {
             Swal.fire({ title: 'Yakin hapus data ini?', text: "Tindakan ini tidak dapat dibatalkan!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal' }).then(async (result) => { 
                 if (result.isConfirmed) { 
                     let type = funcName === 'DasarHukum' ? 'hukum' : funcName.toLowerCase(); 
-                    Swal.fire({title:'Menghapus...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}});
+                    showLoadingAnim('Menghapus Data');
                     try {
                         await callGAS('delete' + funcName, id);
                         refreshAdminData(type); 
@@ -745,7 +764,7 @@ input, button, select, textarea {
         async function savePengaturanUmum(e) { 
             e.preventDefault(); 
             const btn = document.getElementById('btn-save-pengaturan'); 
-            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            showLoadingAnim('Menyimpan Pengaturan');
             const htmlPrivasi = quillPrivasi.root.innerHTML; 
             const data = { nama_aplikasi: document.getElementById('set-app').value, nama_organisasi: document.getElementById('set-org').value, nama_panjang: document.getElementById('set-panjang').value, sk_kemenkumham: document.getElementById('set-sk').value, website: document.getElementById('set-web').value, email: document.getElementById('set-email').value, telepon: document.getElementById('set-hp').value, alamat: document.getElementById('set-alamat').value, ig: document.getElementById('set-ig').value, fb: document.getElementById('set-fb').value, x: document.getElementById('set-x').value, yt: document.getElementById('set-yt').value, tg: document.getElementById('set-tg').value, tt: document.getElementById('set-tt').value, kebijakan_privasi: htmlPrivasi }; 
             const fileLogo = document.getElementById('set-logo'); 
@@ -783,7 +802,7 @@ input, button, select, textarea {
         async function handleSavePetunjuk(e) { 
             e.preventDefault(); 
             const btn = document.getElementById('btn-save-ptj'); 
-            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            showLoadingAnim('Menyimpan Data Petunjuk');
             const fileInput = document.getElementById('ptj-pdf'); 
             const narasi = document.getElementById('ptj-narasi').value; 
             const yt = document.getElementById('ptj-yt').value; 
@@ -814,7 +833,7 @@ input, button, select, textarea {
             const btn = document.getElementById('btn-save-adm'); 
             const data = { admin_nama: document.getElementById('adm-nama').value, admin_jabatan: document.getElementById('adm-jabatan').value, admin_hp: document.getElementById('adm-hp').value, admin_email: document.getElementById('adm-email').value }; 
             btn.disabled = true; 
-            Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}}); 
+            showLoadingAnim('Menyimpan Data Admin');
             let base64Data = null; 
             if (cropperAdm) { base64Data = cropperAdm.getCroppedCanvas({width: 600, height: 800}).toDataURL('image/jpeg', 0.8); } 
             
