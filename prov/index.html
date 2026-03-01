@@ -1093,7 +1093,9 @@ function renderAdmin() {
        html += '<div id="viewSetting" class="hidden"><div class="card" style="max-width:1000px;margin:0 auto"><h3 style="margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid #eee"><i class="fa fa-sliders-h"></i> Pengaturan Aplikasi</h3><form onsubmit="handleSaveSetting(event)">';
        html += '<div class="form-grid"><div class="full-w"><label>Nama Organisasi</label><input type="text" id="set_nama" value="'+(s.nama||'')+'"></div><div><label>Singkatan</label><input type="text" id="set_singkatan" value="'+(s.singkatan||'')+'"></div>';
        html += '<div class="full-w"><label>Logo Organisasi</label><div style="display:flex;gap:15px;align-items:center;background:#f9fafb;padding:10px;border:1px solid #e2e8f0;border-radius:8px"><img src="'+getImageUrl(s.logo)+'" id="preview_logo_set" style="width:50px;height:50px;object-fit:contain"><input type="file" id="file_logo" accept="image/*" onchange="previewLogoSetting(event)" style="border:none;background:transparent;"><input type="hidden" id="set_logo_url" value="'+(s.logo||'')+'"></div></div>';
-       html += '<div class="full-w"><label>Running Text</label><input type="text" id="set_running" value="'+(s.running||'')+'"></div><div><label>No HP</label><input type="text" id="set_hp" value="'+(s.hp||'')+'"></div><div><label>No WA</label><input type="text" id="set_wa" value="'+(s.wa||'')+'"></div><div><label>Email</label><input type="text" id="set_email" value="'+(s.email||'')+'"></div><div><label>Website</label><input type="text" id="set_web" value="'+(s.web||'')+'"></div><div class="full-w"><label>Provinsi Default</label><input type="text" id="set_prov" value="'+(s.provinsi_default||'')+'"></div></div>';
+       html += '<div class="full-w"><label>Running Text</label><input type="text" id="set_running" value="'+(s.running||'')+'"></div><div><label>No HP</label><input type="text" id="set_hp" value="'+(s.hp||'')+'"></div><div><label>No WA</label><input type="text" id="set_wa" value="'+(s.wa||'')+'"></div><div><label>Email</label><input type="text" id="set_email" value="'+(s.email||'')+'"></div><div><label>Website</label><input type="text" id="set_web" value="'+(s.web||'')+'"></div></div>';
+        // UBAH MENJADI (Kita bagi 2 grid, satu untuk Provinsi, satu untuk Nama Admin):
+      html += '<div><label>Provinsi Default</label><input type="text" id="set_prov" value="'+(s.provinsi_default||'')+'"></div><div><label>Nama Admin Prov</label><input type="text" id="set_nama_admin" value="'+(s.nama_admin_prov||'')+'"></div></div>';
        html += '<button type="submit" class="btn btn-primary" style="width:100%;margin-top:20px">SIMPAN PENGATURAN</button></form></div></div>';
    }
 
@@ -1290,7 +1292,22 @@ function handleRegistration(e) {
 }
 
 function showPrivacyPolicy() { var s = appData.settings || {nama: 'Organisasi'}; var html = '<div style="text-align:left; font-size:13px; color:#333; max-height:300px; overflow-y:auto; padding-right:5px; line-height:1.6"><p><strong>Terakhir Diperbarui: '+new Date().toLocaleDateString('id-ID')+'</strong></p><p>Kami admin dan pengurus <b>'+s.nama+'</b> berkomitmen untuk melindungi privasi dan keamanan data pribadi anggota kami. Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi Anda.</p><h4>1. Informasi yang Kami Kumpulkan</h4><p>Kami mengumpulkan data pribadi yang Anda berikan saat pendaftaran, meliputi: Nama Lengkap, NIK, Tempat/Tanggal Lahir, Foto, dan data kepegawaian/instansi terkait.</p><h4>2. Penggunaan Informasi</h4><p>Data digunakan semata-mata untuk: <ul><li>Administrasi keanggotaan dan pembuatan KTA Digital.</li><li>Pemetaan dan statistik organisasi.</li><li>Komunikasi resmi organisasi.</li></ul>Data Anda tidak akan diperjualbelikan kepada pihak ketiga.</p><h4>3. Keamanan Data</h4><p>Kami menerapkan langkah-langkah keamanan teknis untuk melindungi data Anda dari akses yang tidak sah. Foto dan dokumen disimpan secara aman di server yang terenkripsi.</p><h4>4. Hak Anda</h4><p>Anda berhak untuk melihat, memperbarui, atau meminta penghapusan data keanggotaan Anda dengan menghubungi Admin Pusat.</p></div>'; Swal.fire({ title: 'Kebijakan Privasi', html: html, width: 600, confirmButtonText: 'Saya Mengerti', confirmButtonColor: '#4f46e5' }); }
-function showForgotInfo() { var wa = appData.settings.wa || ''; var waLink = wa ? '<a href="https://wa.me/'+wa+'" target="_blank" style="color:#4f46e5;font-weight:bold;text-decoration:underline;font-size:16px"><i class="fab fa-whatsapp"></i> WA Admin Provinsi : '+wa+'</a>' : 'Hubungi Admin Pusat'; Swal.fire({ title: 'Lupa Password?', html: '<div style="text-align:center;color:#333;font-size:14px">Silahkan hubungi admin anda untuk reset ke password standar (123456).<br><br>' + waLink + '</div>', icon: 'info', confirmButtonText: 'Tutup' }); }
+
+function showForgotInfo() { 
+    var s = appData.settings || {};
+    var wa = s.wa || ''; 
+    var namaAdmin = s.nama_admin_prov ? ' (' + s.nama_admin_prov + ')' : '';
+    
+    var waLink = wa ? '<a href="https://wa.me/'+wa+'" target="_blank" style="color:#4f46e5;font-weight:bold;text-decoration:underline;font-size:16px"><i class="fab fa-whatsapp"></i> WA Admin Prov : '+wa+namaAdmin+'</a>' : 'Hubungi Admin Pusat'; 
+    
+    Swal.fire({ 
+        title: 'Lupa Password?', 
+        html: '<div style="text-align:center;color:#333;font-size:14px">Silahkan hubungi admin Anda untuk mereset password.<br><br>' + waLink + '</div>', 
+        icon: 'info', 
+        confirmButtonText: 'Tutup' 
+    }); 
+}
+
 function togglePasswordLogin() { var x = document.getElementById("p"); var i = document.getElementById("togglePass"); if (x.type === "password") { x.type = "text"; i.classList.replace('fa-eye', 'fa-eye-slash'); } else { x.type = "password"; i.classList.replace('fa-eye-slash', 'fa-eye'); } }
 function togglePassVisibility(inputId, iconEl) { var x = document.getElementById(inputId); if (x.type === "password") { x.type = "text"; iconEl.classList.replace('fa-eye', 'fa-eye-slash'); } else { x.type = "password"; iconEl.classList.replace('fa-eye-slash', 'fa-eye'); } }
 
@@ -1357,9 +1374,9 @@ function handleSaveSetting(e) {
     var fileInput = document.getElementById('file_logo'); 
     
     var saveFinalData = function(finalLogoUrl) { 
-        var d = { nama: document.getElementById('set_nama').value, singkatan: document.getElementById('set_singkatan').value, theme: '#4f46e5', logo: finalLogoUrl, running: document.getElementById('set_running').value, hp: document.getElementById('set_hp').value, wa: document.getElementById('set_wa').value, email: document.getElementById('set_email').value, web: document.getElementById('set_web').value, provinsi: document.getElementById('set_prov').value }; 
+        var d = { nama: document.getElementById('set_nama').value, singkatan: document.getElementById('set_singkatan').value, theme: '#4f46e5', logo: finalLogoUrl, running: document.getElementById('set_running').value, hp: document.getElementById('set_hp').value, wa: document.getElementById('set_wa').value, email: document.getElementById('set_email').value, web: document.getElementById('set_web').value, provinsi: document.getElementById('set_prov').value, nama_admin_prov: document.getElementById('set_nama_admin').value };
         apiCall('saveAppSettings', d).then(function(res){ 
-            Swal.close(); if(res.status === 'success') { appData.settings = d; appData.settings.provinsi_default = d.provinsi; Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Pengaturan disimpan!', timer: 1500, showConfirmButton: false }).then(() => { renderAdmin(); switchTab('dash'); }); } else { Swal.fire('Gagal', res.message, 'error'); } 
+            Swal.close(); if(res.status === 'success') { appData.settings = d; appData.settings.provinsi_default = d.provinsi; appData.settings.nama_admin_prov = d.nama_admin_prov; Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Pengaturan disimpan!', timer: 1500, showConfirmButton: false }).then(() => { renderAdmin(); switchTab('dash'); }); } else { Swal.fire('Gagal', res.message, 'error'); } 
         }).catch(err => Swal.fire('Error', err.message, 'error')); 
     }; 
     
