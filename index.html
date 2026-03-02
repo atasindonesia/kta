@@ -118,41 +118,46 @@ input, button, select, textarea {
             <div class="absolute right-0 z-20 h-full w-12 bg-gradient-to-l from-navy to-transparent"></div>
         </div>
 
-        <section class="py-12 bg-gradient-to-b from-gray-50 to-white relative z-20 w-full border-b border-gray-200">
+       <section class="py-4 md:py-12 bg-gradient-to-b from-gray-50 to-white relative z-20 w-full border-b border-gray-200">
             <div class="max-w-6xl mx-auto px-4">
-                <div class="text-center mb-8 md:mb-12">
-                    <h2 class="text-2xl md:text-3xl font-bold text-navy inline-block">Statistik Anggota</h2>
-                    <div class="w-20 h-1 md:h-1.5 bg-gold mx-auto mt-2 rounded-full"></div>
+                <div class="text-center mb-4 md:mb-12">
+                    <h2 class="text-lg md:text-3xl font-bold text-navy inline-block">Statistik Anggota</h2>
+                    <div class="w-12 md:w-20 h-1 md:h-1.5 bg-gold mx-auto mt-1 md:mt-2 rounded-full"></div>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
-                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-6 text-center">
+                    
+                    <div class="bg-white p-2 md:p-6 rounded-xl md:rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group flex flex-col justify-center">
                         <div class="absolute top-0 left-0 w-full h-1 bg-yellow-400 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                        <div class="w-10 h-10 sm:w-14 sm:h-14 mx-auto bg-yellow-50 rounded-full flex items-center justify-center mb-3 text-yellow-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-users text-lg sm:text-2xl"></i></div>
-                        <p class="text-[10px] sm:text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Total Mendaftar</p>
-                        <p id="stat-daftar" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy">0</p>
+                        <div class="w-7 h-7 md:w-14 md:h-14 mx-auto bg-yellow-50 rounded-full flex items-center justify-center mb-1 md:mb-3 text-yellow-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-users text-xs md:text-2xl"></i></div>
+                        <p class="text-[9px] md:text-xs text-gray-500 font-bold mb-0 md:mb-1 uppercase tracking-wider leading-tight">Total Mendaftar</p>
+                        <p id="stat-daftar" class="text-base md:text-4xl font-extrabold text-navy leading-none mt-1">0</p>
                     </div>
-                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group">
+
+                    <div class="bg-white p-2 md:p-6 rounded-xl md:rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group flex flex-col justify-center">
                         <div class="absolute top-0 left-0 w-full h-1 bg-blue-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                        <div class="w-10 h-10 sm:w-14 sm:h-14 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-3 text-blue-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-id-card text-lg sm:text-2xl"></i></div>
-                        <p class="text-[10px] sm:text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Punya KTA</p>
-                        <p id="stat-kta" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-blue-600">0</p>
+                        <div class="w-7 h-7 md:w-14 md:h-14 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-1 md:mb-3 text-blue-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-id-card text-xs md:text-2xl"></i></div>
+                        <p class="text-[9px] md:text-xs text-gray-500 font-bold mb-0 md:mb-1 uppercase tracking-wider leading-tight">Punya KTA</p>
+                        <p id="stat-kta" class="text-base md:text-4xl font-extrabold text-blue-600 leading-none mt-1">0</p>
                     </div>
-                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group">
+
+                    <div class="bg-white p-2 md:p-6 rounded-xl md:rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group flex flex-col justify-center">
                         <div class="absolute top-0 left-0 w-full h-1 bg-green-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                        <div class="w-10 h-10 sm:w-14 sm:h-14 mx-auto bg-green-50 rounded-full flex items-center justify-center mb-3 text-green-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-user-check text-lg sm:text-2xl"></i></div>
-                        <p class="text-[10px] sm:text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Anggota Aktif</p>
-                        <p id="stat-aktif" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-green-500">0</p>
+                        <div class="w-7 h-7 md:w-14 md:h-14 mx-auto bg-green-50 rounded-full flex items-center justify-center mb-1 md:mb-3 text-green-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-user-check text-xs md:text-2xl"></i></div>
+                        <p class="text-[9px] md:text-xs text-gray-500 font-bold mb-0 md:mb-1 uppercase tracking-wider leading-tight">Anggota Aktif</p>
+                        <p id="stat-aktif" class="text-base md:text-4xl font-extrabold text-green-500 leading-none mt-1">0</p>
                     </div>
-                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group">
+
+                    <div class="bg-white p-2 md:p-6 rounded-xl md:rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group flex flex-col justify-center">
                         <div class="absolute top-0 left-0 w-full h-1 bg-red-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                        <div class="w-10 h-10 sm:w-14 sm:h-14 mx-auto bg-red-50 rounded-full flex items-center justify-center mb-3 text-red-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-user-xmark text-lg sm:text-2xl"></i></div>
-                        <p class="text-[10px] sm:text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Belum Aktif</p>
-                        <p id="stat-tidak-aktif" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-red-500">0</p>
+                        <div class="w-7 h-7 md:w-14 md:h-14 mx-auto bg-red-50 rounded-full flex items-center justify-center mb-1 md:mb-3 text-red-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-user-xmark text-xs md:text-2xl"></i></div>
+                        <p class="text-[9px] md:text-xs text-gray-500 font-bold mb-0 md:mb-1 uppercase tracking-wider leading-tight">Tidak Aktif</p>
+                        <p id="stat-tidak-aktif" class="text-base md:text-4xl font-extrabold text-red-500 leading-none mt-1">0</p>
                     </div>
+
                 </div>
             </div>
         </section>
-
+        
        <section id="provinsi" class="py-16 max-w-7xl mx-auto px-4 relative z-10 w-full" style="margin-top: 40px !important;">
             <div class="text-center mb-10 w-full">
                 <h2 class="text-3xl font-bold text-navy border-b-4 border-gold inline-block pb-2">Daftar Anggota Provinsi</h2>
