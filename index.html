@@ -57,6 +57,21 @@ input, button, select, textarea {
             will-change: transform, scroll-position; 
             transform: translateZ(0); 
         }
+
+        /* Animasi Marquee / Teks Berjalan */
+        @keyframes marqueeScroll {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee-scroll {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marqueeScroll 25s linear infinite;
+            will-change: transform;
+        }
+        .animate-marquee-scroll:hover {
+            animation-play-state: paused;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans flex flex-col min-h-screen overflow-x-hidden">
@@ -88,12 +103,53 @@ input, button, select, textarea {
             </div>
         </section>
 
-        <section class="relative z-20 -mt-10 mx-4 md:mx-auto max-w-6xl">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200"><p class="text-sm text-gray-500 font-semibold mb-1">Total Mendaftar</p><p id="stat-daftar" class="text-3xl font-bold text-navy">0</p></div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200"><p class="text-sm text-gray-500 font-semibold mb-1">Punya KTA</p><p id="stat-kta" class="text-3xl font-bold text-blue-600">0</p></div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200"><p class="text-sm text-gray-500 font-semibold mb-1">Anggota Aktif</p><p id="stat-aktif" class="text-3xl font-bold text-green-500">0</p></div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200"><p class="text-sm text-gray-500 font-semibold mb-1">Tidak Aktif</p><p id="stat-tidak-aktif" class="text-3xl font-bold text-red-500">0</p></div>
+        <div class="w-full bg-navy border-y border-gold/40 relative flex items-center overflow-hidden h-12 md:h-14 shadow-md">
+            <div class="absolute left-0 z-20 flex items-center h-full bg-gradient-to-r from-navy via-navy to-transparent pr-8 pl-4 sm:pl-8">
+                <div class="flex items-center gap-2 bg-blue-900/80 px-3 py-1 rounded-full border border-blue-400/30 backdrop-blur-sm shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
+                    <i class="fa-solid fa-bullhorn text-gold animate-pulse text-sm md:text-base"></i>
+                    <span class="font-bold text-xs sm:text-sm tracking-widest text-gold uppercase">Info</span>
+                </div>
+            </div>
+            <div class="w-full overflow-hidden flex items-center h-full">
+                <div class="animate-marquee-scroll flex items-center h-full pl-24 sm:pl-32">
+                    <span id="teks-pengumuman" class="text-gray-200 text-sm md:text-base font-medium tracking-wide">Selamat datang di SAPA KTA. Silakan lakukan pendaftaran anggota melalui menu yang tersedia...</span>
+                </div>
+            </div>
+            <div class="absolute right-0 z-20 h-full w-12 bg-gradient-to-l from-navy to-transparent"></div>
+        </div>
+
+        <section class="py-12 bg-gradient-to-b from-gray-50 to-white relative z-20 w-full border-b border-gray-200">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 class="text-2xl md:text-3xl font-bold text-navy inline-block">Statistik Anggota</h2>
+                    <div class="w-20 h-1 md:h-1.5 bg-gold mx-auto mt-2 rounded-full"></div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-yellow-400 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 mx-auto bg-yellow-50 rounded-full flex items-center justify-center mb-3 text-yellow-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-users text-lg sm:text-2xl"></i></div>
+                        <p class="text-[10px] sm:text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Total Mendaftar</p>
+                        <p id="stat-daftar" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-navy">0</p>
+                    </div>
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-blue-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-3 text-blue-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-id-card text-lg sm:text-2xl"></i></div>
+                        <p class="text-[10px] sm:text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Punya KTA</p>
+                        <p id="stat-kta" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-blue-600">0</p>
+                    </div>
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-green-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 mx-auto bg-green-50 rounded-full flex items-center justify-center mb-3 text-green-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-user-check text-lg sm:text-2xl"></i></div>
+                        <p class="text-[10px] sm:text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Anggota Aktif</p>
+                        <p id="stat-aktif" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-green-500">0</p>
+                    </div>
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-red-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                        <div class="w-10 h-10 sm:w-14 sm:h-14 mx-auto bg-red-50 rounded-full flex items-center justify-center mb-3 text-red-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-user-xmark text-lg sm:text-2xl"></i></div>
+                        <p class="text-[10px] sm:text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Belum Aktif</p>
+                        <p id="stat-tidak-aktif" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-red-500">0</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -292,6 +348,13 @@ input, button, select, textarea {
                     <form onsubmit="savePengaturanUmum(event)">
                         <h3 class="font-bold text-navy border-b mb-3 pb-1">Data Identitas</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="text-xs font-bold">Nama Aplikasi Singkat</label><input type="text" id="set-app" class="w-full border p-2 rounded" required></div><div><label class="text-xs font-bold">Nama Organisasi</label><input type="text" id="set-org" class="w-full border p-2 rounded" required></div><div class="sm:col-span-2"><label class="text-xs font-bold">Nama Panjang Organisasi</label><input type="text" id="set-panjang" class="w-full border p-2 rounded" required></div><div class="sm:col-span-2"><label class="text-xs font-bold">Nomor SK Kemenkumham</label><input type="text" id="set-sk" class="w-full border p-2 rounded"></div></div>
+
+                        <h3 class="font-bold text-navy border-b mb-3 pb-1 mt-6">Papan Pengumuman</h3>
+                        <div class="mb-4">
+                            <label class="text-xs font-bold">Teks Pengumuman Berjalan (Marquee)</label>
+                            <input type="text" id="set-pengumuman" placeholder="Ketik pengumuman di sini..." class="w-full border p-2 rounded focus:border-gold outline-none shadow-sm">
+                        </div>
+
                         <h3 class="font-bold text-navy border-b mb-3 pb-1 mt-6">Data Kontak</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="text-xs font-bold">Website Utama</label><input type="url" id="set-web" class="w-full border p-2 rounded"></div><div><label class="text-xs font-bold">Email</label><input type="email" id="set-email" class="w-full border p-2 rounded"></div><div><label class="text-xs font-bold">No Telepon / HP</label><input type="text" id="set-hp" class="w-full border p-2 rounded"></div><div class="sm:col-span-2"><label class="text-xs font-bold">Alamat Lengkap</label><textarea id="set-alamat" rows="2" class="w-full border p-2 rounded"></textarea></div></div>
                         <h3 class="font-bold text-navy border-b mb-3 pb-1 mt-6">Media Sosial</h3>
@@ -474,7 +537,7 @@ input, button, select, textarea {
         function initPublicView() {
             try {
                 if (!appDataCache || Object.keys(appDataCache).length === 0) return; const info = appDataCache.infoUmum || {}; const kontak = appDataCache.kontak || {};
-                document.getElementById('logo').src = info.logo_url || ''; document.getElementById('nav-title').innerText = info.nama_aplikasi || 'SAPA KTA'; document.getElementById('hero-title').innerText = info.nama_organisasi || 'Selamat Datang'; document.getElementById('hero-subtitle').innerText = info.nama_panjang || '';
+                document.getElementById('teks-pengumuman').innerText = info.pengumuman || 'Selamat datang di SAPA KTA. Silakan lakukan pendaftaran anggota...'; document.getElementById('logo').src = info.logo_url || ''; document.getElementById('nav-title').innerText = info.nama_aplikasi || 'SAPA KTA'; document.getElementById('hero-title').innerText = info.nama_organisasi || 'Selamat Datang'; document.getElementById('hero-subtitle').innerText = info.nama_panjang || '';
                 const heroLogo = document.getElementById('hero-logo'); if(info.logo_url) { heroLogo.src = info.logo_url; heroLogo.classList.remove('hidden'); } else { heroLogo.classList.add('hidden'); }
 
                 const ftLogo = document.getElementById('ft-logo'); if(info.logo_url) { ftLogo.src = info.logo_url; ftLogo.classList.remove('hidden'); }
@@ -816,14 +879,14 @@ input, button, select, textarea {
             }); 
         }
         
-        function loadPengaturanAdmin() { document.getElementById('set-app').value = appDataCache.infoUmum.nama_aplikasi || ''; document.getElementById('set-org').value = appDataCache.infoUmum.nama_organisasi || ''; document.getElementById('set-panjang').value = appDataCache.infoUmum.nama_panjang || ''; document.getElementById('set-sk').value = appDataCache.infoUmum.sk_kemenkumham || ''; document.getElementById('set-web').value = appDataCache.kontak.website || ''; document.getElementById('set-email').value = appDataCache.kontak.email || ''; document.getElementById('set-hp').value = appDataCache.kontak.telepon || appDataCache.kontak.whatsapp || ''; document.getElementById('set-alamat').value = appDataCache.kontak.alamat || ''; document.getElementById('set-ig').value = appDataCache.kontak.ig || ''; document.getElementById('set-fb').value = appDataCache.kontak.fb || ''; document.getElementById('set-x').value = appDataCache.kontak.x || ''; document.getElementById('set-yt').value = appDataCache.kontak.yt || ''; document.getElementById('set-tg').value = appDataCache.kontak.tg || ''; document.getElementById('set-tt').value = appDataCache.kontak.tt || ''; quillPrivasi.root.innerHTML = appDataCache.infoUmum.kebijakan_privasi || ''; }
+        function loadPengaturanAdmin() { document.getElementById('set-app').value = appDataCache.infoUmum.nama_aplikasi || ''; document.getElementById('set-org').value = appDataCache.infoUmum.nama_organisasi || ''; document.getElementById('set-panjang').value = appDataCache.infoUmum.nama_panjang || ''; document.getElementById('set-sk').value = appDataCache.infoUmum.sk_kemenkumham || ''; document.getElementById('set-pengumuman').value = appDataCache.infoUmum.pengumuman || ''; document.getElementById('set-web').value = appDataCache.kontak.website || ''; document.getElementById('set-email').value = appDataCache.kontak.email || ''; document.getElementById('set-hp').value = appDataCache.kontak.telepon || appDataCache.kontak.whatsapp || ''; document.getElementById('set-alamat').value = appDataCache.kontak.alamat || ''; document.getElementById('set-ig').value = appDataCache.kontak.ig || ''; document.getElementById('set-fb').value = appDataCache.kontak.fb || ''; document.getElementById('set-x').value = appDataCache.kontak.x || ''; document.getElementById('set-yt').value = appDataCache.kontak.yt || ''; document.getElementById('set-tg').value = appDataCache.kontak.tg || ''; document.getElementById('set-tt').value = appDataCache.kontak.tt || ''; quillPrivasi.root.innerHTML = appDataCache.infoUmum.kebijakan_privasi || ''; }
         
         async function savePengaturanUmum(e) { 
             e.preventDefault(); 
             const btn = document.getElementById('btn-save-pengaturan'); 
             showLoadingAnim('Menyimpan Pengaturan');
             const htmlPrivasi = quillPrivasi.root.innerHTML; 
-            const data = { nama_aplikasi: document.getElementById('set-app').value, nama_organisasi: document.getElementById('set-org').value, nama_panjang: document.getElementById('set-panjang').value, sk_kemenkumham: document.getElementById('set-sk').value, website: document.getElementById('set-web').value, email: document.getElementById('set-email').value, telepon: document.getElementById('set-hp').value, alamat: document.getElementById('set-alamat').value, ig: document.getElementById('set-ig').value, fb: document.getElementById('set-fb').value, x: document.getElementById('set-x').value, yt: document.getElementById('set-yt').value, tg: document.getElementById('set-tg').value, tt: document.getElementById('set-tt').value, kebijakan_privasi: htmlPrivasi }; 
+            const data = { pengumuman: document.getElementById('set-pengumuman').value, nama_aplikasi: document.getElementById('set-app').value, nama_organisasi: document.getElementById('set-org').value, nama_panjang: document.getElementById('set-panjang').value, sk_kemenkumham: document.getElementById('set-sk').value, website: document.getElementById('set-web').value, email: document.getElementById('set-email').value, telepon: document.getElementById('set-hp').value, alamat: document.getElementById('set-alamat').value, ig: document.getElementById('set-ig').value, fb: document.getElementById('set-fb').value, x: document.getElementById('set-x').value, yt: document.getElementById('set-yt').value, tg: document.getElementById('set-tg').value, tt: document.getElementById('set-tt').value, kebijakan_privasi: htmlPrivasi }; 
             const fileLogo = document.getElementById('set-logo'); 
             
             try {
