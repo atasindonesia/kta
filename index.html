@@ -363,51 +363,77 @@ input, button, select, textarea {
             }
         }
 
-        // 🔥 CEK SESI LOGIN DI LOCAL STORAGE SAAT HALAMAN DIMUAT
+        // Fungsi terpisah untuk merender tampilan (agar bisa dipanggil ulang tanpa ribet)
+        function jalankanAplikasi() {
+            if(localStorage.getItem('sapaAdminSesi') === 'aktif') {
+                switchView('view-admin');
+                renderDashboard();
+                
+                setTimeout(() => {
+                   if(!document.querySelector('.ql-toolbar')) {
+                       quillPrivasi = new Quill('#editor-privasi', { 
+                           theme: 'snow', 
+                           modules: { 
+                               toolbar: [ 
+                                   [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }], 
+                                   [{ 'header': [1, 2, 3, 4, 5, 6, false] }], 
+                                   ['bold', 'italic', 'underline', 'strike'], 
+                                   [{ 'color': [] }, { 'background': [] }], 
+                                   [{ 'script': 'sub'}, { 'script': 'super' }], 
+                                   [{ 'list': 'ordered'}, { 'list': 'bullet' }], 
+                                   [{ 'indent': '-1'}, { 'indent': '+1' }], 
+                                   [{ 'align': [] }], 
+                                   ['blockquote', 'code-block'], 
+                                   ['link', 'image', 'video'], 
+                                   ['clean'] 
+                               ] 
+                           }, 
+                           placeholder: 'Ketik Kebijakan Privasi Anda di sini secara lengkap dengan rapi...' 
+                       }); 
+                   }
+                }, 500);
+            } else {
+                initPublicView(); 
+            }
+        }
+
+        // 🔥 LOGIKA CACHE-FIRST: BUKA WEB INSTAN 0 DETIK
         document.addEventListener('DOMContentLoaded', () => { 
-            showLoadingAnim('Memuat Data Sistem');
-            callGAS('getAppData').then(res => {
-                if(res.success) {
-                    appDataCache = res.appData;
-                    Swal.close();
-                    
-                    if(localStorage.getItem('sapaAdminSesi') === 'aktif') {
-                        switchView('view-admin');
-                        renderDashboard();
-                        
-                        setTimeout(() => {
-                           if(!document.querySelector('.ql-toolbar')) {
-                               quillPrivasi = new Quill('#editor-privasi', { theme: 'snow', modules: { toolbar: [ [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }], [{ 'header': [1, 2, 3, 4, 5, 6, false] }], ['bold', 'italic', 'underline', 'strike'], [{ 'color': [] }, { 'background': [] }], [{ 'script': 'sub'}, { 'script': 'super' }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'indent': '-1'}, { 'indent': '+1' }], [{ 'align': [] }], ['blockquote', 'code-block'], ['link', 'image', 'video'], ['clean'] ] }, placeholder: 'Ketik Kebijakan Privasi Anda di sini secara lengkap dengan rapi...' });
-                           }
-                        }, 500);
-                    } else {
-                        initPublicView(); 
+            // 1. Cek apakah sudah ada data dari kunjungan sebelumnya
+            const dataTersimpan = localStorage.getItem('sapaAppDataCache');
+            
+            if (dataTersimpan) {
+                // JIKA ADA CACHE: Render seketika saat itu juga (Tanpa Loading Screen!)
+                appDataCache = JSON.parse(dataTersimpan);
+                jalankanAplikasi();
+                
+                // 2. Lakukan "Background Fetch" untuk mengambil update terbaru diam-diam
+                callGAS('getAppData').then(res => {
+                    if(res.success) {
+                        // Perbarui data lokal dan render ulang tampilannya secara halus
+                        appDataCache = res.appData;
+                        localStorage.setItem('sapaAppDataCache', JSON.stringify(res.appData));
+                        jalankanAplikasi(); 
                     }
-                }
-            }).catch(err => {
-                Swal.fire('Error', 'Gagal memuat data dari server database.', 'error');
-            });
+                }).catch(e => console.log("Cek update latar belakang gagal, abaikan."));
+                
+            } else {
+                // JIKA KOSONG (Baru buka web pertama kali): Wajib pakai Loading Animasi
+                showLoadingAnim('Memuat Data Sistem');
+                callGAS('getAppData').then(res => {
+                    if(res.success) {
+                        appDataCache = res.appData;
+                        // Simpan datanya ke cache browser untuk kunjungan berikutnya
+                        localStorage.setItem('sapaAppDataCache', JSON.stringify(res.appData));
+                        Swal.close();
+                        jalankanAplikasi();
+                    }
+                }).catch(err => {
+                    Swal.fire('Error', 'Gagal memuat data dari server.', 'error');
+                });
+            }
         });
 
-        let isScrolling = false;
-        window.addEventListener('scroll', () => {
-            if (!isScrolling) {
-                window.requestAnimationFrame(() => {
-                    const btnScroll = document.getElementById('btn-scroll-top');
-                    if(btnScroll) {
-                        if (window.scrollY > 300) { 
-                            btnScroll.classList.remove('opacity-0', 'pointer-events-none'); 
-                            btnScroll.classList.add('opacity-100', 'pointer-events-auto'); 
-                        } else { 
-                            btnScroll.classList.add('opacity-0', 'pointer-events-none'); 
-                            btnScroll.classList.remove('opacity-100', 'pointer-events-auto'); 
-                        }
-                    }
-                    isScrolling = false;
-                });
-                isScrolling = true;
-            }
-        }, { passive: true }); 
 
         function switchView(viewId) { document.getElementById('view-public').classList.add('hidden'); document.getElementById('view-login').classList.add('hidden'); document.getElementById('view-admin').classList.add('hidden'); document.getElementById(viewId).classList.remove('hidden'); if(viewId === 'view-public') initPublicView(); }
         
@@ -607,10 +633,13 @@ input, button, select, textarea {
             if (id === 'menu-dashboard') { renderDashboard(); }
         }
         
+        // Update Fungsi Refresh Admin agar Cache juga terupdate
         function refreshAdminData(renderType) { 
             callGAS('getAppData').then(res => {
                 if(res.success) {
                     appDataCache = res.appData; 
+                    // Timpa cache lama dengan yang baru setiap ada data baru disimpan
+                    localStorage.setItem('sapaAppDataCache', JSON.stringify(res.appData));
                     if(renderType) renderTable(renderType); 
                 }
             });
