@@ -118,7 +118,8 @@ input, button, select, textarea {
             <div class="absolute right-0 z-20 h-full w-12 bg-gradient-to-l from-navy to-transparent"></div>
         </div>
 
-       <section class="py-4 md:py-12 bg-gradient-to-b from-gray-50 to-white relative z-20 w-full border-b border-gray-200">
+        
+        <section class="py-4 md:py-12 bg-gradient-to-b from-gray-50 to-white relative z-20 w-full border-b border-gray-200">
             <div class="max-w-6xl mx-auto px-4">
                 <div class="text-center mb-4 md:mb-12">
                     <h2 class="text-lg md:text-3xl font-bold text-navy inline-block">Statistik Anggota</h2>
@@ -150,14 +151,14 @@ input, button, select, textarea {
                     <div class="bg-white p-2 md:p-6 rounded-xl md:rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-gray-100 card-hover relative overflow-hidden group flex flex-col justify-center">
                         <div class="absolute top-0 left-0 w-full h-1 bg-red-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                         <div class="w-7 h-7 md:w-14 md:h-14 mx-auto bg-red-50 rounded-full flex items-center justify-center mb-1 md:mb-3 text-red-500 transition-transform group-hover:scale-110"><i class="fa-solid fa-user-xmark text-xs md:text-2xl"></i></div>
-                        <p class="text-[9px] md:text-xs text-gray-500 font-bold mb-0 md:mb-1 uppercase tracking-wider leading-tight">Tidak Aktif</p>
+                        <p class="text-[9px] md:text-xs text-gray-500 font-bold mb-0 md:mb-1 uppercase tracking-wider leading-tight">Belum Aktif</p>
                         <p id="stat-tidak-aktif" class="text-base md:text-4xl font-extrabold text-red-500 leading-none mt-1">0</p>
                     </div>
 
                 </div>
             </div>
         </section>
-        
+
        <section id="provinsi" class="py-16 max-w-7xl mx-auto px-4 relative z-10 w-full" style="margin-top: 40px !important;">
             <div class="text-center mb-10 w-full">
                 <h2 class="text-3xl font-bold text-navy border-b-4 border-gold inline-block pb-2">Daftar Anggota Provinsi</h2>
@@ -565,7 +566,11 @@ input, button, select, textarea {
 
                 const pengurusContainer = document.getElementById('pengurus-container'); if (pengurusContainer) pengurusContainer.innerHTML = '';
                 if(appDataCache.pengurus && appDataCache.pengurus.length > 0) { 
-                    appDataCache.pengurus.forEach(p => { pengurusContainer.innerHTML += '<div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col items-center flex-shrink-0 snap-center w-[calc(50%-0.5rem)] md:w-[calc(25%-0.75rem)] card-hover"><img src="'+(p.foto_url || 'https://via.placeholder.com/300x400')+'" alt="'+(p.nama || '')+'" class="w-full foto-pengurus"><div class="p-3 text-center w-full bg-navy text-white"><h4 class="font-bold text-sm truncate text-gold">'+(p.nama || '')+'</h4><p class="text-xs text-gray-300 truncate">'+(p.jabatan || '')+'</p></div></div>'; }); 
+
+                    // === DESAIN MODERN PENGURUS PUSAT (OVERLAY & ZOOM HOVER) ===
+                    appDataCache.pengurus.forEach(p => { 
+                        pengurusContainer.innerHTML += '<div class="relative rounded-2xl shadow-lg overflow-hidden flex-shrink-0 snap-center w-[calc(50%-0.5rem)] md:w-[calc(25%-0.75rem)] group cursor-pointer border-2 border-transparent hover:border-gold transition-all duration-300"><div class="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-transparent opacity-90 z-10"></div><img src="'+(p.foto_url || 'https://via.placeholder.com/300x400')+'" alt="'+(p.nama || '')+'" class="w-full foto-pengurus transform transition-transform duration-700 group-hover:scale-110 object-cover"><div class="absolute bottom-0 left-0 w-full p-4 z-20 text-center transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300"><h4 class="font-extrabold text-sm md:text-base text-gold drop-shadow-md">'+(p.nama || '')+'</h4><p class="text-[10px] md:text-xs text-white font-medium tracking-wide mt-1">'+(p.jabatan || '')+'</p><div class="w-0 h-0.5 bg-gold mx-auto mt-2 transition-all duration-500 group-hover:w-1/2"></div></div></div>'; 
+                    });
                     document.getElementById('pengurus-section').classList.remove('hidden'); 
                     if(window.pengurusInterval) clearInterval(window.pengurusInterval);
                     window.pengurusInterval = setInterval(() => { const pContainer = document.getElementById('pengurus-container'); if(!pContainer) return; const maxScroll = pContainer.scrollWidth - pContainer.clientWidth; if(pContainer.scrollLeft >= maxScroll - 10) { pContainer.scrollTo({ left: 0, behavior: 'smooth' }); } else { pContainer.scrollBy({ left: pContainer.clientWidth, behavior: 'smooth' }); } }, 4000);
@@ -584,7 +589,9 @@ input, button, select, textarea {
                         tDaftar += parseInt(prov.jumlah_daftar) || 0; tKTA += parseInt(prov.jumlah_kta) || 0; tAktif += parseInt(prov.jumlah_aktif) || 0; tTidakAktif += parseInt(prov.jumlah_tidak_aktif) || 0; 
                         let cleanWa = String(prov.hp_admin || '').replace(/[^0-9]/g, ''); if(cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.substring(1); let waUrl = cleanWa ? 'https://wa.me/' + cleanWa : '#'; let safeNamaProvinsi = String(prov.nama_provinsi || ''); 
                         
-                        provContainer.innerHTML += '<div class="prov-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden card-hover flex flex-col snap-center shrink-0 w-full min-w-full md:w-[320px] md:min-w-[320px] min-h-[250px] box-border" data-nama="'+safeNamaProvinsi.toLowerCase()+'" style="display: flex !important;"><div class="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 p-3"><h3 class="font-bold text-white text-center truncate">'+safeNamaProvinsi+'</h3></div><div class="p-5 flex-grow flex flex-col justify-between space-y-4"><div class="text-sm space-y-3"><div><p class="text-xs text-gray-500 font-bold mb-1">Helpdesk Admin Prov. :</p><p class="font-semibold text-gray-800 flex items-center">👤 '+(prov.nama_admin || '-')+'</p></div><div><p class="text-xs text-gray-500 font-bold mb-1">Kontak (HP/WA) :</p><a href="'+waUrl+'" target="_blank" rel="noopener noreferrer" class="font-semibold text-green-600 flex items-center hover:text-green-700"><i class="fa-brands fa-whatsapp text-green-500 text-xl mr-2"></i> '+(prov.hp_admin || '-')+'</a></div></div><a href="'+(prov.link_pendaftaran || '#')+'" target="_blank" rel="noopener noreferrer" class="block w-full text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-bold py-2 rounded shadow-md hover:opacity-90 transition text-sm">Daftar & Login Anggota</a></div></div>'; 
+                        // === DESAIN PROVINSI PAS 3 KOLOM DI LAPTOP ===
+                        provContainer.innerHTML += '<div class="prov-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden card-hover flex flex-col snap-center shrink-0 w-full min-w-full md:w-[calc(33.333%-1rem)] md:min-w-[calc(33.333%-1rem)] min-h-[250px] box-border" data-nama="'+safeNamaProvinsi.toLowerCase()+'" style="display: flex !important;"><div class="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 p-3"><h3 class="font-bold text-white text-center truncate">'+safeNamaProvinsi+'</h3></div><div class="p-5 flex-grow flex flex-col justify-between space-y-4"><div class="text-sm space-y-3"><div><p class="text-xs text-gray-500 font-bold mb-1">Helpdesk Admin Prov. :</p><p class="font-semibold text-gray-800 flex items-center">👤 '+(prov.nama_admin || '-')+'</p></div><div><p class="text-xs text-gray-500 font-bold mb-1">Kontak (HP/WA) :</p><a href="'+waUrl+'" target="_blank" rel="noopener noreferrer" class="font-semibold text-green-600 flex items-center hover:text-green-700"><i class="fa-brands fa-whatsapp text-green-500 text-xl mr-2"></i> '+(prov.hp_admin || '-')+'</a></div></div><a href="'+(prov.link_pendaftaran || '#')+'" target="_blank" rel="noopener noreferrer" class="block w-full text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-bold py-2 rounded shadow-md hover:opacity-90 transition text-sm">Daftar & Login Anggota</a></div></div>';
+
                     }); 
                 }
 
@@ -592,7 +599,13 @@ input, button, select, textarea {
             } catch (err) { Swal.fire('Error', 'Ada Error Data: ' + err.message, 'error'); }
         }
 
-        function slideProvinsi(direction) { const container = document.getElementById('provinsi-container'); const scrollAmount = window.innerWidth < 768 ? container.clientWidth : 340; container.scrollBy({ left: scrollAmount * direction, behavior: 'smooth' }); }
+        // === FUNGSI SLIDE PROVINSI DISESUAIKAN UNTUK 3 KOLOM ===
+        function slideProvinsi(direction) { 
+            const container = document.getElementById('provinsi-container'); 
+            // Jika HP geser full layar, Jika Laptop geser sepertiga layar (1 kotak)
+            const scrollAmount = window.innerWidth < 768 ? container.clientWidth : (container.clientWidth / 3); 
+            container.scrollBy({ left: scrollAmount * direction, behavior: 'smooth' }); 
+        }
         
         function filterProvinsi() { 
             const input = document.getElementById('searchInput').value.toLowerCase(); 
