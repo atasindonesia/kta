@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -225,7 +226,7 @@ input, button, select, textarea {
                 <button onclick="showMenu('menu-petunjuk'); loadPetunjukAdmin();" class="w-full text-left p-2 hover:bg-gray-800 rounded">ℹ️ Petunjuk & Admin Pusat</button>
                 <button onclick="showMenu('menu-pengaturan'); loadPengaturanAdmin();" class="w-full text-left p-2 hover:bg-gray-800 rounded">⚙️ Pengaturan Umum</button>
             </nav>
-            <div class="p-4 border-t border-gray-700"><button onclick="switchView('view-public')" class="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700 font-bold">Keluar</button></div>
+            <div class="p-4 border-t border-gray-700"><button onclick="logoutAdmin()" class="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700 font-bold">Keluar</button></div>
         </aside>
 
         <main class="flex-1 p-4 md:p-8 overflow-y-auto relative text-gray-800 mt-[60px] md:mt-0 h-full w-full">
@@ -321,9 +322,6 @@ input, button, select, textarea {
         let adminProvPage = 1; const adminProvPerPage = 10; let adminProvSearch = '';
         let adminPengurusPage = 1; const adminPengurusPerPage = 10; let adminPengurusSearch = '';
 
-        // ==========================================
-        // FUNGSI ANIMASI LOADING HITUNG MUNDUR (5 DETIK)
-        // ==========================================
         let loadingTimerInterval;
         function showLoadingAnim(text) {
             let counter = 5;
@@ -350,13 +348,13 @@ input, button, select, textarea {
             });
         }
 
-        // Fungsi ajaib pengganti google.script.run
+        // Fungsi ajaib pengganti google.script.run (DENGAN API KEY)
         async function callGAS(action, payload = {}) {
             try {
                 const response = await fetch(GAS_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: action, payload: payload })
+                    body: JSON.stringify({ action: action, payload: payload, apiKey: "SAPA_KTA_SECRET_2026" })
                 });
                 return await response.json();
             } catch (error) {
@@ -365,13 +363,26 @@ input, button, select, textarea {
             }
         }
 
+        // 🔥 CEK SESI LOGIN DI LOCAL STORAGE SAAT HALAMAN DIMUAT
         document.addEventListener('DOMContentLoaded', () => { 
             showLoadingAnim('Memuat Data Sistem');
             callGAS('getAppData').then(res => {
                 if(res.success) {
                     appDataCache = res.appData;
                     Swal.close();
-                    initPublicView(); 
+                    
+                    if(localStorage.getItem('sapaAdminSesi') === 'aktif') {
+                        switchView('view-admin');
+                        renderDashboard();
+                        
+                        setTimeout(() => {
+                           if(!document.querySelector('.ql-toolbar')) {
+                               quillPrivasi = new Quill('#editor-privasi', { theme: 'snow', modules: { toolbar: [ [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }], [{ 'header': [1, 2, 3, 4, 5, 6, false] }], ['bold', 'italic', 'underline', 'strike'], [{ 'color': [] }, { 'background': [] }], [{ 'script': 'sub'}, { 'script': 'super' }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'indent': '-1'}, { 'indent': '+1' }], [{ 'align': [] }], ['blockquote', 'code-block'], ['link', 'image', 'video'], ['clean'] ] }, placeholder: 'Ketik Kebijakan Privasi Anda di sini secara lengkap dengan rapi...' });
+                           }
+                        }, 500);
+                    } else {
+                        initPublicView(); 
+                    }
                 }
             }).catch(err => {
                 Swal.fire('Error', 'Gagal memuat data dari server database.', 'error');
@@ -399,7 +410,26 @@ input, button, select, textarea {
         }, { passive: true }); 
 
         function switchView(viewId) { document.getElementById('view-public').classList.add('hidden'); document.getElementById('view-login').classList.add('hidden'); document.getElementById('view-admin').classList.add('hidden'); document.getElementById(viewId).classList.remove('hidden'); if(viewId === 'view-public') initPublicView(); }
-        function handleMobileAdminMenu(val) { if (val === 'logout') { switchView('view-public'); document.getElementById('admin-mobile-menu').value = 'menu-dashboard'; } else { showMenu(val); let type = val.replace('menu-', ''); if (['provinsi', 'pengurus', 'slide', 'hukum'].includes(type)) { renderTable(type); } else if (type === 'petunjuk') { loadPetunjukAdmin(); } else if (type === 'pengaturan') { loadPengaturanAdmin(); } } }
+        
+        // Fungsi Keluar / Logout
+        function logoutAdmin() {
+            localStorage.removeItem('sapaAdminSesi');
+            switchView('view-public');
+            document.getElementById('admin-mobile-menu').value = 'menu-dashboard';
+        }
+
+        function handleMobileAdminMenu(val) { 
+            if (val === 'logout') { 
+                logoutAdmin(); 
+            } else { 
+                showMenu(val); 
+                let type = val.replace('menu-', ''); 
+                if (['provinsi', 'pengurus', 'slide', 'hukum'].includes(type)) { renderTable(type); } 
+                else if (type === 'petunjuk') { loadPetunjukAdmin(); } 
+                else if (type === 'pengaturan') { loadPengaturanAdmin(); } 
+            } 
+        }
+        
         function togglePassword() { const pwd = document.getElementById('password'); const icon = document.getElementById('eye-icon'); if (pwd.type === 'password') { pwd.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); } else { pwd.type = 'password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); } }
 
         function showAdminPusatModal() {
@@ -460,7 +490,6 @@ input, button, select, textarea {
                         tDaftar += parseInt(prov.jumlah_daftar) || 0; tKTA += parseInt(prov.jumlah_kta) || 0; tAktif += parseInt(prov.jumlah_aktif) || 0; tTidakAktif += parseInt(prov.jumlah_tidak_aktif) || 0; 
                         let cleanWa = String(prov.hp_admin || '').replace(/[^0-9]/g, ''); if(cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.substring(1); let waUrl = cleanWa ? 'https://wa.me/' + cleanWa : '#'; let safeNamaProvinsi = String(prov.nama_provinsi || ''); 
                         
-                        // KODE YANG SUDAH DITAMBAHKAN REL NOOPENER NOREFERRER AGAR KLIK INSTAN
                         provContainer.innerHTML += '<div class="prov-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden card-hover flex flex-col snap-center shrink-0 w-full min-w-full md:w-[320px] md:min-w-[320px] min-h-[250px] box-border" data-nama="'+safeNamaProvinsi.toLowerCase()+'" style="display: flex !important;"><div class="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 p-3"><h3 class="font-bold text-white text-center truncate">'+safeNamaProvinsi+'</h3></div><div class="p-5 flex-grow flex flex-col justify-between space-y-4"><div class="text-sm space-y-3"><div><p class="text-xs text-gray-500 font-bold mb-1">Helpdesk Admin Prov. :</p><p class="font-semibold text-gray-800 flex items-center">👤 '+(prov.nama_admin || '-')+'</p></div><div><p class="text-xs text-gray-500 font-bold mb-1">Kontak (HP/WA) :</p><a href="'+waUrl+'" target="_blank" rel="noopener noreferrer" class="font-semibold text-green-600 flex items-center hover:text-green-700"><i class="fa-brands fa-whatsapp text-green-500 text-xl mr-2"></i> '+(prov.hp_admin || '-')+'</a></div></div><a href="'+(prov.link_pendaftaran || '#')+'" target="_blank" rel="noopener noreferrer" class="block w-full text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-white font-bold py-2 rounded shadow-md hover:opacity-90 transition text-sm">Daftar & Login Anggota</a></div></div>'; 
                     }); 
                 }
@@ -492,28 +521,33 @@ input, button, select, textarea {
                 
                 btn.innerText = "Masuk"; 
                 if(res.success){ 
-                    switchView('view-admin'); 
-                    renderDashboard(); // Render Grafik Dashboard
+                    // 🔥 SIMPAN SESI LOGIN
+                    localStorage.setItem('sapaAdminSesi', 'aktif');
                     
-                    quillPrivasi = new Quill('#editor-privasi', { 
-                        theme: 'snow', 
-                        modules: { 
-                            toolbar: [ 
-                                [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }], 
-                                [{ 'header': [1, 2, 3, 4, 5, 6, false] }], 
-                                ['bold', 'italic', 'underline', 'strike'], 
-                                [{ 'color': [] }, { 'background': [] }], 
-                                [{ 'script': 'sub'}, { 'script': 'super' }], 
-                                [{ 'list': 'ordered'}, { 'list': 'bullet' }], 
-                                [{ 'indent': '-1'}, { 'indent': '+1' }], 
-                                [{ 'align': [] }], 
-                                ['blockquote', 'code-block'], 
-                                ['link', 'image', 'video'], 
-                                ['clean'] 
-                            ] 
-                        }, 
-                        placeholder: 'Ketik Kebijakan Privasi Anda di sini secara lengkap dengan rapi...' 
-                    }); 
+                    switchView('view-admin'); 
+                    renderDashboard(); 
+                    
+                    if(!document.querySelector('.ql-toolbar')) {
+                        quillPrivasi = new Quill('#editor-privasi', { 
+                            theme: 'snow', 
+                            modules: { 
+                                toolbar: [ 
+                                    [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }], 
+                                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }], 
+                                    ['bold', 'italic', 'underline', 'strike'], 
+                                    [{ 'color': [] }, { 'background': [] }], 
+                                    [{ 'script': 'sub'}, { 'script': 'super' }], 
+                                    [{ 'list': 'ordered'}, { 'list': 'bullet' }], 
+                                    [{ 'indent': '-1'}, { 'indent': '+1' }], 
+                                    [{ 'align': [] }], 
+                                    ['blockquote', 'code-block'], 
+                                    ['link', 'image', 'video'], 
+                                    ['clean'] 
+                                ] 
+                            }, 
+                            placeholder: 'Ketik Kebijakan Privasi Anda di sini secara lengkap dengan rapi...' 
+                        }); 
+                    }
                     Swal.fire({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, icon: 'success', title: 'Login Berhasil'}); 
                 } else { 
                     Swal.fire('Gagal Login', res.message, 'error'); 
@@ -524,7 +558,6 @@ input, button, select, textarea {
             }
         }
 
-        // FUNGSI RENDER DASHBOARD & GRAFIK
         function renderDashboard() {
             if (!appDataCache || !appDataCache.provinsi) return;
             
@@ -545,7 +578,7 @@ input, button, select, textarea {
             document.getElementById('dash-nonaktif').innerText = tTidakAktif.toLocaleString('id-ID');
 
             const ctx = document.getElementById('dashboardChart');
-            if (!ctx) return; // Mencegah error jika canvas tidak ditemukan
+            if (!ctx) return; 
             const context2d = ctx.getContext('2d');
             
             if (dashChart) dashChart.destroy(); 
