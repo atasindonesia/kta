@@ -1050,6 +1050,22 @@ input, button, select, textarea {
         });
 
 
+// Trigger untuk menampilkan/menyembunyikan tombol scroll-to-top
+  window.addEventListener('scroll', () => {
+      const btnScroll = document.getElementById('btn-scroll-top');
+      if (btnScroll) {
+          // Tampilkan tombol jika layar di-scroll lebih dari 200px
+          if (window.scrollY > 200 || document.documentElement.scrollTop > 200) {
+              btnScroll.classList.remove('opacity-0', 'pointer-events-none');
+              btnScroll.classList.add('opacity-100');
+          } else {
+              // Sembunyikan kembali jika sedang di posisi atas
+              btnScroll.classList.remove('opacity-100');
+              btnScroll.classList.add('opacity-0', 'pointer-events-none');
+          }
+      }
+  });
+
   //kunci service-worker.js
   if ('serviceWorker' in navigator) {
 
