@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "kta.atas.indonesia",
+        "sha256_cert_fingerprints": ["C7:01:57:80:9B:0D:59:75:67:3E:17:32:7B:D5:95:D1:09:44:C9:39:B4:8E:F9:CC:55:98:52:69:8E:25:A0:4F"]
+      }
+    }]
