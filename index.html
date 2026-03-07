@@ -1012,52 +1012,41 @@ input, button, select, textarea {
 
         function getBase64(file) { return new Promise((res, rej) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload=()=>res(reader.result); reader.onerror=e=>rej(e); }); }
 
-        // 🔥 LOGIKA MODAL INSTALL PWA (TENGAH LAYAR)
-        let deferredPrompt;
+        // 🔥 LOGIKA MODAL INSTALL (ARAH KE PLAYSTORE)
         const pwaInstallModal = document.getElementById('pwa-install-modal');
         const btnNantiPwa = document.getElementById('btn-nanti-pwa');
         const btnInstallPwaModal = document.getElementById('btn-install-pwa-modal');
 
-        // Sensor otomatis dari browser: Akan menyala JIKA aplikasi BELUM diinstal
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // 1. Cegah browser menampilkan popup bawaan bawah layar yang kaku
-            e.preventDefault();
-            // 2. Simpan event-nya untuk memicu instalasi nanti
-            deferredPrompt = e;
-            // 3. Tampilkan modal buatan kita yang keren di tengah layar!
-            pwaInstallModal.classList.remove('hidden');
-        });
+        // 🔴 MASUKKAN LINK PLAYSTORE APLIKASI ANDA DI SINI 🔴
+        const linkPlaystore = "https://play.google.com/store/apps/details?id=kta.atas.indonesia";
 
-        // Jika user klik tombol INSTALL
-        btnInstallPwaModal.addEventListener('click', async () => {
-            if (deferredPrompt !== null) {
-                // Sembunyikan modal kita agar layar bersih
-                pwaInstallModal.classList.add('hidden');
-                // Tampilkan jendela konfirmasi install resmi dari sistem Android
-                deferredPrompt.prompt();
-                // Tunggu respon user (apakah jadi install atau batal)
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('User setuju menginstal aplikasi');
-                }
-                // Kosongkan memori
-                deferredPrompt = null;
+        // Fungsi mengecek apakah sedang dibuka di dalam Aplikasi (Standalone / TWA) atau Browser biasa
+        function isRunningInApp() {
+            return (window.matchMedia('(display-mode: standalone)').matches) || 
+                   (window.navigator.standalone === true) || 
+                   (document.referrer.includes('android-app://'));
+        }
+
+        // Jalankan saat halaman selesai dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            // Jika BUKAN dibuka di aplikasi (artinya di browser biasa), munculkan popup
+            if (!isRunningInApp()) {
+                // Munculkan popup dengan delay 1.5 detik agar lebih smooth setelah loading
+                setTimeout(() => {
+                    pwaInstallModal.classList.remove('hidden');
+                }, 1500);
             }
         });
 
-        // Jika user klik tombol NANTI
-        btnNantiPwa.addEventListener('click', () => {
-            // Sembunyikan modal. Karena kita tidak simpan ke localStorage, 
-            // modal ini akan otomatis muncul lagi saat web direload/dibuka kembali.
+        // Jika user klik tombol INSTALL -> Arahkan ke Playstore
+        btnInstallPwaModal.addEventListener('click', () => {
             pwaInstallModal.classList.add('hidden');
+            window.location.href = linkPlaystore; // Membuka link Playstore
         });
 
-        // Jika aplikasi sukses TERINSTAL
-        window.addEventListener('appinstalled', () => {
-            // Pastikan modal ditutup dan tidak akan pernah dipanggil lagi
+        // Jika user klik tombol NANTI -> Tutup modal
+        btnNantiPwa.addEventListener('click', () => {
             pwaInstallModal.classList.add('hidden');
-            deferredPrompt = null;
-            console.log('Aplikasi SAPA KTA berhasil diinstal!');
         });
 
 
