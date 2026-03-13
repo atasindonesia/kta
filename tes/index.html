@@ -878,7 +878,7 @@ const LIST_DATABASE = {
 "36papuatengah": "https://script.google.com/macros/s/AKfyc...A/exec",
 "37papuapegunungan": "https://script.google.com/macros/s/AKfyc...A/exec",
 "38papuabaratdaya": "https://script.google.com/macros/s/AKfyc...A/exec",
-"demokta": "https://script.google.com/macros/s/AKfycbz9YkFlWtQAVStPp0Pz761_4di8GPvc1HrrZju39LjG4ZK8P2tmJzwkdz75wdOOBmqY/exec",
+"demokta": "https://script.google.com/macros/s/AKfycbwrs2tL2wz3TQ1r2dbzcQVUu0pSok1X6ymkZw8BMhCNyNIi2vKfmbdTlMTtQvbWJ5ti/exec",
 };
 
 // Baca parameter dari URL browser (contoh: web.com/?id=cabangA)
@@ -1608,7 +1608,7 @@ function openContactPopup() {
 }
 
 // =========================================================
-// FUNGSI BARU: RENDER HALAMAN VALIDASI SCAN QR
+// FUNGSI BARU: RENDER HALAMAN VALIDASI SCAN QR (V2)
 // =========================================================
 function renderValidationPage(nia) {
     showLoader(true, "MEMVALIDASI KTA...");
@@ -1620,6 +1620,11 @@ function renderValidationPage(nia) {
 
         if(res.valid) {
             var d = res.data;
+            
+            // Simpan data ke memori sementara agar bisa digenerate jadi KTA saat tombol diklik
+            window.tempPublicMember = d;
+            window.tempPublicLogo = res.orgLogo;
+
             var stColor = d.status === 'AKTIF' ? 'color:#16a34a; background:#dcfce7;' : (String(d.status).includes('NONAKTIF') ? 'color:#dc2626; background:#fee2e2;' : 'color:#c2410c; background:#ffedd5;');
             var cleanLogo = getImageUrl(res.orgLogo);
             var cleanFoto = getImageUrl(d.foto);
@@ -1645,7 +1650,7 @@ function renderValidationPage(nia) {
                             <b style="color:var(--text-gray)">Nama</b> <span style="font-weight:600; text-align:right; max-width:65%;">${d.nama}</span>
                         </div>
                         <div style="padding:8px 0; border-bottom:1px dashed #cbd5e1; display:flex; justify-content:space-between;">
-                            <b style="color:var(--text-gray)">TTL</b> <span style="text-align:right; max-width:65%;">${d.ttl}</span>
+                            <b style="color:var(--text-gray)">Tgl Lahir</b> <span style="text-align:right;">${d.tgl_lahir}</span>
                         </div>
                         <div style="padding:8px 0; border-bottom:1px dashed #cbd5e1; display:flex; justify-content:space-between;">
                             <b style="color:var(--text-gray)">Gender</b> <span style="text-align:right;">${d.jk}</span>
@@ -1655,6 +1660,9 @@ function renderValidationPage(nia) {
                         </div>
                         <div style="padding:8px 0; border-bottom:1px dashed #cbd5e1; display:flex; justify-content:space-between;">
                             <b style="color:var(--text-gray)">Jabatan Org</b> <span style="text-align:right; max-width:60%;">${d.jabatan_org}</span>
+                        </div>
+                        <div style="padding:8px 0; border-bottom:1px dashed #cbd5e1; display:flex; justify-content:space-between;">
+                            <b style="color:var(--text-gray)">Tingkat</b> <span style="text-align:right; max-width:60%;">${d.tingkat_pengurus}</span>
                         </div>
                         <div style="padding:8px 0; border-bottom:1px dashed #cbd5e1; display:flex; justify-content:space-between;">
                             <b style="color:var(--text-gray)">Kab/Kota</b> <span style="text-align:right;">${d.kabupaten}</span>
@@ -1670,7 +1678,7 @@ function renderValidationPage(nia) {
                     </div>
                     
                     <br>
-                    ${d.link_kta && d.link_kta.length > 5 ? `<a href="${d.link_kta}" target="_blank" class="btn btn-green" style="width:100%; justify-content:center; margin-bottom:10px;"><i class="fa fa-id-card"></i> Lihat KTA Digital PDF</a>` : ''}
+                    <button onclick="generatePublicKTA()" class="btn btn-green" style="width:100%; justify-content:center; margin-bottom:10px;"><i class="fa fa-id-badge"></i> Lihat KTA Digital</button>
                     
                     <button onclick="window.location.href = window.location.origin + window.location.pathname + '?id=' + (typeof dbId !== 'undefined' && dbId !== 'default' ? dbId : '')" class="btn btn-outline" style="width:100%; justify-content:center;"><i class="fa fa-home"></i> Kembali ke Beranda</button>
                 </div>
@@ -1678,7 +1686,6 @@ function renderValidationPage(nia) {
             `;
             appDiv.innerHTML = html;
         } else {
-            // JIKA NIA TIDAK DITEMUKAN / TIDAK VALID
             var html = `
             <div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--bg-body); padding:20px;">
                 <div class="glass-card" style="margin-top:0; padding:30px; text-align:center; max-width:400px; width:100%; background:white; border-radius:20px; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
@@ -1695,6 +1702,71 @@ function renderValidationPage(nia) {
     }).catch(function(err) {
         showLoader(false);
         Swal.fire('Error API', 'Gagal memvalidasi QR: ' + err.message, 'error');
+    });
+}
+
+// =========================================================
+// FUNGSI BARU: GENERATE KTA DI HALAMAN PUBLIK
+// =========================================================
+function generatePublicKTA() {
+    var d = window.tempPublicMember;
+    if (!d) return Swal.fire('Error', 'Data anggota tidak tersedia', 'error');
+    
+    showLoader(true, 'MEMBUAT KTA DIGITAL...');
+
+    const loadImage = (src) => {
+        return new Promise((resolve) => {
+            if (!src) return resolve(null); const img = new Image(); img.crossOrigin = "Anonymous"; img.onload = () => resolve(img); img.onerror = () => resolve(null); img.src = src;
+        });
+    };
+
+    apiCall('getKtaResources', {photoUrl: d.foto, logoUrl: window.tempPublicLogo}).then(async function(assets) {
+        try { await document.fonts.load("bold 21px Oswald"); } catch(e) { console.log(e); }
+        const [bgImg, logoImg, photoImg] = await Promise.all([ loadImage(assets.bg), loadImage(assets.logo), loadImage(assets.photo) ]);
+        
+        var canvas = document.getElementById('ktaCanvas'); 
+        var ctx = canvas.getContext('2d');
+        
+        if (bgImg) { 
+            ctx.drawImage(bgImg, 0, 0, 600, 380); 
+        } else { 
+            var grd = ctx.createLinearGradient(0, 0, 600, 0); grd.addColorStop(0, "#4f46e5"); grd.addColorStop(1, "#7c3aed"); ctx.fillStyle = grd; ctx.fillRect(0, 0, 600, 380); 
+        }
+
+        var nama = d.nama.length > 30 ? d.nama.substring(0, 30) + "..." : d.nama; 
+        ctx.shadowColor = "rgba(0,0,0,0.5)"; ctx.shadowBlur = 0; ctx.fillStyle = "black"; ctx.font = "bold 21px Oswald"; 
+        var leftX = 160; var topY = 160; 
+        ctx.fillText("N I A      : " + (d.nia || "-"), leftX, topY); 
+        ctx.fillText("Nama     : " + nama, leftX, topY + 28); 
+        ctx.fillText("Instansi : " + (d.unit || "-"), leftX, topY + 56); 
+        ctx.fillText("Provinsi : " + (d.provinsi || "-"), leftX, topY + 84);
+
+        // Buat QR Code URL yang mengarah kembali ke halaman ini
+        var baseUrl = window.location.origin + window.location.pathname;
+        var verifyUrl = baseUrl + "?id=" + (typeof dbId !== 'undefined' && dbId !== 'default' ? dbId : '') + "&verify=" + encodeURIComponent(d.nia);
+        var qr = new QRious({ value: verifyUrl, size: 250, level: 'H' }); 
+        const qrImg = await loadImage(qr.toDataURL());
+
+        if (qrImg) { ctx.fillStyle = "white"; ctx.fillRect(9, 277, 96, 96); ctx.drawImage(qrImg, 9, 277, 96, 96); }
+
+        var photoX = 25; var photoY = 120; var fixedHeight = 132; var fixedWidth = 99; 
+        if (photoImg) { 
+            var ratio = photoImg.width / photoImg.height; var newWidth = fixedHeight * ratio; 
+            ctx.lineWidth = 5; ctx.strokeStyle = "white"; ctx.strokeRect(photoX, photoY, newWidth, fixedHeight); ctx.drawImage(photoImg, photoX, photoY, newWidth, fixedHeight); 
+        } else { 
+            ctx.fillStyle = "#cbd5e1"; ctx.fillRect(photoX, photoY, fixedWidth, fixedHeight); ctx.fillStyle = "#64748b"; ctx.font = "12px Arial"; ctx.fillText("No Foto", photoX + 25, photoY + 70); 
+        }
+
+        showLoader(false); 
+        openModal('ktaGenModal');
+        
+        var btnDownload = document.getElementById('downloadKtaBtn'); 
+        btnDownload.href = canvas.toDataURL("image/png");
+        var namaAman = (d.nama || "Anggota").replace(/[^a-zA-Z0-9]/g, "_"); btnDownload.download = "KTA_Digital_" + namaAman + ".png";
+        
+    }).catch(function(err) { 
+        showLoader(false); 
+        Swal.fire("Gagal", "Koneksi lambat/Error Server: " + err.message, "error"); 
     });
 }
 
