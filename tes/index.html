@@ -878,7 +878,7 @@ const LIST_DATABASE = {
 "36papuatengah": "https://script.google.com/macros/s/AKfyc...A/exec",
 "37papuapegunungan": "https://script.google.com/macros/s/AKfyc...A/exec",
 "38papuabaratdaya": "https://script.google.com/macros/s/AKfyc...A/exec",
-"demokta": "https://script.google.com/macros/s/AKfycbwrs2tL2wz3TQ1r2dbzcQVUu0pSok1X6ymkZw8BMhCNyNIi2vKfmbdTlMTtQvbWJ5ti/exec",
+"demokta": "https://script.google.com/macros/s/AKfycbwvhhyJM8VXG2XpB7B6fpoBoQVEGG9lzSu3xPO-M4kA4TKknGEzTkVNY7GzeCXgMbtc/exec",
 };
 
 // Baca parameter dari URL browser (contoh: web.com/?id=cabangA)
@@ -1608,7 +1608,7 @@ function openContactPopup() {
 }
 
 // =========================================================
-// FUNGSI BARU: RENDER HALAMAN VALIDASI SCAN QR (V2)
+// FUNGSI BARU: RENDER HALAMAN VALIDASI SCAN QR (V3)
 // =========================================================
 function renderValidationPage(nia) {
     showLoader(true, "MEMVALIDASI KTA...");
@@ -1628,12 +1628,57 @@ function renderValidationPage(nia) {
             var stColor = d.status === 'AKTIF' ? 'color:#16a34a; background:#dcfce7;' : (String(d.status).includes('NONAKTIF') ? 'color:#dc2626; background:#fee2e2;' : 'color:#c2410c; background:#ffedd5;');
             var cleanLogo = getImageUrl(res.orgLogo);
             var cleanFoto = getImageUrl(d.foto);
+            
+            // Siapkan URL Beranda
+            var homeUrl = window.location.origin + window.location.pathname + '?id=' + (typeof dbId !== 'undefined' && dbId !== 'default' ? dbId : '');
 
             var html = `
-            <div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--bg-body); padding:20px;">
+            <style>
+                /* Style khusus untuk Halaman Validasi */
+                .val-bottom-bar { display: none; }
+                .val-org-short { margin:0; font-family:'Poppins', sans-serif; color:var(--text-dark); font-weight:800; font-size:22px; }
+                .val-org-long { margin:0; font-size:11px; color:var(--text-gray); font-weight:500; line-height:1.3; text-transform:uppercase; }
+                
+                @media (max-width: 768px) {
+                    /* Hilangkan tombol desktop jika di HP */
+                    .val-btn-desktop { display: none !important; }
+                    /* Tampilkan Native Bottom Bar */
+                    .val-bottom-bar {
+                        display: flex; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 75px;
+                        background: white; align-items: center; justify-content: space-between;
+                        box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 9999;
+                    }
+                    .val-nav-item {
+                        display: flex; flex-direction: column; align-items: center; justify-content: center;
+                        color: #64748b; font-size: 10px; cursor: pointer; font-weight: 600; transition: 0.2s;
+                    }
+                    .val-nav-item i { font-size: 22px; margin-bottom: 4px; }
+                    .val-nav-item:active { color: #4f46e5; }
+                    
+                    /* Formasi 20% - 60% - 20% */
+                    .val-nav-left { width: 20%; }
+                    .val-nav-right { width: 20%; }
+                    .val-nav-center { width: 60%; display: flex; justify-content: center; }
+                    
+                    .btn-val-center {
+                        background: linear-gradient(135deg, #10b981, #059669); color: white;
+                        border: none; padding: 13px 0; width: 92%; border-radius: 30px;
+                        font-weight: 700; font-size: 14px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+                        display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+                    }
+                    .btn-val-center:active { transform: scale(0.95); }
+                    
+                    /* Tambah ruang di bawah agar konten tidak tertutup bar */
+                    .val-container { padding-bottom: 95px !important; }
+                }
+            </style>
+
+            <div class="val-container" style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--bg-body); padding:20px;">
                 <div class="glass-card" style="margin-top:0; padding:30px; text-align:center; max-width:400px; width:100%; background:white; border-radius:20px; box-shadow:0 10px 25px rgba(0,0,0,0.1); animation: slideUp 0.5s ease-out;">
-                    <img src="${cleanLogo}" onerror="this.src='https://via.placeholder.com/100?text=LOGO';" style="height:60px; object-fit:contain; margin-bottom:15px;">
-                    <h3 style="margin:0; font-family:'Poppins', sans-serif; color:var(--text-dark);">${res.orgName}</h3>
+                    
+                    <img src="${cleanLogo}" onerror="this.src='https://via.placeholder.com/100?text=LOGO';" style="height:65px; object-fit:contain; margin-bottom:10px;">
+                    <h3 class="val-org-short">${res.orgShort || 'ATAS INDONESIA'}</h3>
+                    <p class="val-org-long">${res.orgName}</p>
                     
                     <div style="margin:20px 0; padding:15px; border-radius:12px; background:#f0fdf4; border:1px solid #bbf7d0;">
                         <i class="fa fa-check-circle" style="color:#16a34a; font-size:45px; margin-bottom:10px;"></i>
@@ -1677,15 +1722,36 @@ function renderValidationPage(nia) {
                         </div>
                     </div>
                     
-                    <br>
-                    <button onclick="generatePublicKTA()" class="btn btn-green" style="width:100%; justify-content:center; margin-bottom:10px;"><i class="fa fa-id-badge"></i> Lihat KTA Digital</button>
-                    
-                    <button onclick="window.location.href = window.location.origin + window.location.pathname + '?id=' + (typeof dbId !== 'undefined' && dbId !== 'default' ? dbId : '')" class="btn btn-outline" style="width:100%; justify-content:center;"><i class="fa fa-home"></i> Kembali ke Beranda</button>
+                    <div class="val-btn-desktop">
+                        <br>
+                        <button onclick="generatePublicKTA()" class="btn btn-green" style="width:100%; justify-content:center; margin-bottom:10px;"><i class="fa fa-id-badge"></i> Lihat KTA Digital</button>
+                        <button onclick="window.location.href = '${homeUrl}'" class="btn btn-outline" style="width:100%; justify-content:center;"><i class="fa fa-home"></i> Kembali ke Beranda</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="val-bottom-bar">
+                <div class="val-nav-item val-nav-left" onclick="window.location.href = '${homeUrl}'">
+                    <i class="fa fa-home"></i>
+                    <span>Beranda</span>
+                </div>
+                
+                <div class="val-nav-center">
+                    <button class="btn-val-center" onclick="generatePublicKTA()">
+                        <i class="fa fa-id-badge"></i> KTA Digital
+                    </button>
+                </div>
+                
+                <div class="val-nav-item val-nav-right" onclick="handleCloseValidation()">
+                    <i class="fa fa-times-circle" style="color:#ef4444;"></i>
+                    <span>Tutup</span>
                 </div>
             </div>
             `;
             appDiv.innerHTML = html;
         } else {
+            // TAMPILAN JIKA KTA TIDAK VALID
+            var homeUrl = window.location.origin + window.location.pathname + '?id=' + (typeof dbId !== 'undefined' && dbId !== 'default' ? dbId : '');
             var html = `
             <div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--bg-body); padding:20px;">
                 <div class="glass-card" style="margin-top:0; padding:30px; text-align:center; max-width:400px; width:100%; background:white; border-radius:20px; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
@@ -1693,7 +1759,7 @@ function renderValidationPage(nia) {
                     <h3 style="margin:0 0 10px 0; font-family:'Poppins', sans-serif; color:var(--text-dark);">KTA Tidak Dikenali</h3>
                     <p style="color:var(--text-gray); font-size:14px; margin-bottom:25px;">Maaf, data KTA ini tidak terdaftar, tidak valid, atau telah dihapus dari sistem keanggotaan kami.</p>
                     
-                    <button onclick="window.location.href = window.location.origin + window.location.pathname + '?id=' + (typeof dbId !== 'undefined' && dbId !== 'default' ? dbId : '')" class="btn btn-primary" style="width:100%; justify-content:center;"><i class="fa fa-home"></i> Kembali ke Beranda</button>
+                    <button onclick="window.location.href = '${homeUrl}'" class="btn btn-primary" style="width:100%; justify-content:center;"><i class="fa fa-home"></i> Kembali ke Beranda</button>
                 </div>
             </div>
             `;
@@ -1702,6 +1768,32 @@ function renderValidationPage(nia) {
     }).catch(function(err) {
         showLoader(false);
         Swal.fire('Error API', 'Gagal memvalidasi QR: ' + err.message, 'error');
+    });
+}
+
+// Fungsi bantu untuk tombol "Tutup" di HP
+// Karena browser punya sistem keamanan ketat soal menutup tab via script, 
+// kita pakai trik: coba tutup window, kalau gagal, lempar ke Beranda.
+function handleCloseValidation() {
+    Swal.fire({
+        title: 'Tutup Halaman?',
+        text: "Anda akan keluar dari halaman validasi ini.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#4f46e5',
+        cancelButtonColor: '#ef4444',
+        confirmButtonText: 'Ya, Tutup',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Coba tutup tab
+            window.close();
+            // Jika browser memblokir (karena discan via kamera bawaan HP), kembalikan ke home
+            setTimeout(function() {
+                var homeUrl = window.location.origin + window.location.pathname + '?id=' + (typeof dbId !== 'undefined' && dbId !== 'default' ? dbId : '');
+                window.location.href = homeUrl;
+            }, 300);
+        }
     });
 }
 
