@@ -1,8 +1,11 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "kta.atas.indonesia",
-        "sha256_cert_fingerprints": ["4D:DF:7D:1D:26:87:BC:15:81:2A:02:CE:52:AB:E3:57:90:DF:42:B5:C7:F0:0A:4C:A9:8C:CE:86:9D:0F:95:8C"]
-      }
-    }]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "kta.atas.indonesia",
+      "sha256_cert_fingerprints":
+        ["4D:DF:7D:1D:26:87:BC:15:81:2A:02:CE:52:AB:E3:57:90:DF:42:B5:C7:F0:0A:4C:A9:8C:CE:86:9D:0F:95:8C"]
+    }
+  }
+]
