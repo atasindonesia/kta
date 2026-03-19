@@ -3,7 +3,7 @@ const CACHE_NAME = 'app-sapa-kta-auto';
 const urlsToCache = [
   './',
   './index.html',
-  './logo-kta.png',
+  '/logo-kta.png',
   './manifest.json'
 ];
 
