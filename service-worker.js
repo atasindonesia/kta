@@ -1,10 +1,10 @@
 // Ganti nama cache ini sesuai nama aplikasimu (bebas)
 const CACHE_NAME = 'app-sapa-kta-auto'; 
 const urlsToCache = [
-  './',
-  './index.html',
+  '/',
+  '/index.html',
   '/logo-kta.png',
-  './manifest.json'
+  '/manifest.json'
 ];
 
 // Tahap 1: Install & Simpan file ke memori HP pertama kali
