@@ -1521,20 +1521,24 @@ function generateKTA() {
         // Kita set size lebih besar dan level Error Correction 'H' (High) agar mudah discan kamera HP
         var qr = new QRious({ value: verifyUrl, size: 250, level: 'H' }); 
         const qrImg = await loadImage(qr.toDataURL());
+        
         if (qrImg) { 
             // 1. Gambar latar putih dasar dan QR Code-nya
             ctx.fillStyle = "white"; 
             ctx.fillRect(9, 277, 96, 96); 
             ctx.drawImage(qrImg, 9, 277, 96, 96); 
 
-            // 2. Tambahkan Logo Organisasi di tengah QR Code
+            // 2. Tambahkan Logo Organisasi di tengah QR Code (UPDATED: SLIM FIT)
             if (logoImg) {
                 var qrCenterX = 9 + (96 / 2);
                 var qrCenterY = 277 + (96 / 2);
-                var bgSize = 28; // Ukuran kotak putih pelindung (bisa dibesarkan/dikecilkan)
-                var logoSize = 22; // Ukuran logo di dalam kotak putih
+                
+                // --- BAGIAN YANG DIUBAH AGAR PAS ---
+                var logoSize = 22; // Ukuran logo tetap
+                var bgSize = 23;   // Kotak putih pelindung (DIKECILKAN agar pas dg logo)
+                // ------------------------------------
 
-                // Gambar kotak putih solid agar barcode tidak menabrak logo
+                // Gambar kotak putih solid pelindung (sekarang ukurannya sangat pas dengan logo)
                 ctx.fillStyle = "white";
                 ctx.fillRect(qrCenterX - (bgSize/2), qrCenterY - (bgSize/2), bgSize, bgSize);
 
@@ -1852,14 +1856,17 @@ function generatePublicKTA() {
             ctx.fillRect(9, 277, 96, 96); 
             ctx.drawImage(qrImg, 9, 277, 96, 96); 
 
-            // 2. Tambahkan Logo Organisasi di tengah QR Code
+            // 2. Tambahkan Logo Organisasi di tengah QR Code (UPDATED: SLIM FIT)
             if (logoImg) {
                 var qrCenterX = 9 + (96 / 2);
                 var qrCenterY = 277 + (96 / 2);
-                var bgSize = 28; // Ukuran kotak putih pelindung
-                var logoSize = 22; // Ukuran logo
+                
+                // --- BAGIAN YANG DIUBAH AGAR PAS ---
+                var logoSize = 22; // Ukuran logo tetap
+                var bgSize = 23;   // Kotak putih pelindung (DIKECILKAN agar pas dg logo)
+                // ------------------------------------
 
-                // Gambar kotak putih solid agar barcode tidak menabrak logo
+                // Gambar kotak putih solid pelindung (sekarang ukurannya sangat pas dengan logo)
                 ctx.fillStyle = "white";
                 ctx.fillRect(qrCenterX - (bgSize/2), qrCenterY - (bgSize/2), bgSize, bgSize);
 
