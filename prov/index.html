@@ -1521,7 +1521,27 @@ function generateKTA() {
         // Kita set size lebih besar dan level Error Correction 'H' (High) agar mudah discan kamera HP
         var qr = new QRious({ value: verifyUrl, size: 250, level: 'H' }); 
         const qrImg = await loadImage(qr.toDataURL());
-        if (qrImg) { ctx.fillStyle = "white"; ctx.fillRect(9, 277, 96, 96); ctx.drawImage(qrImg, 9, 277, 96, 96); }
+        if (qrImg) { 
+            // 1. Gambar latar putih dasar dan QR Code-nya
+            ctx.fillStyle = "white"; 
+            ctx.fillRect(9, 277, 96, 96); 
+            ctx.drawImage(qrImg, 9, 277, 96, 96); 
+
+            // 2. Tambahkan Logo Organisasi di tengah QR Code
+            if (logoImg) {
+                var qrCenterX = 9 + (96 / 2);
+                var qrCenterY = 277 + (96 / 2);
+                var bgSize = 28; // Ukuran kotak putih pelindung (bisa dibesarkan/dikecilkan)
+                var logoSize = 22; // Ukuran logo di dalam kotak putih
+
+                // Gambar kotak putih solid agar barcode tidak menabrak logo
+                ctx.fillStyle = "white";
+                ctx.fillRect(qrCenterX - (bgSize/2), qrCenterY - (bgSize/2), bgSize, bgSize);
+
+                // Gambar logo di atas kotak putih
+                ctx.drawImage(logoImg, qrCenterX - (logoSize/2), qrCenterY - (logoSize/2), logoSize, logoSize);
+            }
+        }
 
         var photoX = 25; var photoY = 120; var fixedHeight = 132; var fixedWidth = 99; 
         if (photoImg) { var ratio = photoImg.width / photoImg.height; var newWidth = fixedHeight * ratio; ctx.lineWidth = 5; ctx.strokeStyle = "white"; ctx.strokeRect(photoX, photoY, newWidth, fixedHeight); ctx.drawImage(photoImg, photoX, photoY, newWidth, fixedHeight); } else { ctx.fillStyle = "#cbd5e1"; ctx.fillRect(photoX, photoY, fixedWidth, fixedHeight); ctx.fillStyle = "#64748b"; ctx.font = "12px Arial"; ctx.fillText("No Foto", photoX + 25, photoY + 70); }
@@ -1826,7 +1846,27 @@ function generatePublicKTA() {
         var qr = new QRious({ value: verifyUrl, size: 250, level: 'H' }); 
         const qrImg = await loadImage(qr.toDataURL());
 
-        if (qrImg) { ctx.fillStyle = "white"; ctx.fillRect(9, 277, 96, 96); ctx.drawImage(qrImg, 9, 277, 96, 96); }
+        if (qrImg) { 
+            // 1. Gambar latar putih dasar dan QR Code-nya
+            ctx.fillStyle = "white"; 
+            ctx.fillRect(9, 277, 96, 96); 
+            ctx.drawImage(qrImg, 9, 277, 96, 96); 
+
+            // 2. Tambahkan Logo Organisasi di tengah QR Code
+            if (logoImg) {
+                var qrCenterX = 9 + (96 / 2);
+                var qrCenterY = 277 + (96 / 2);
+                var bgSize = 28; // Ukuran kotak putih pelindung
+                var logoSize = 22; // Ukuran logo
+
+                // Gambar kotak putih solid agar barcode tidak menabrak logo
+                ctx.fillStyle = "white";
+                ctx.fillRect(qrCenterX - (bgSize/2), qrCenterY - (bgSize/2), bgSize, bgSize);
+
+                // Gambar logo di atas kotak putih
+                ctx.drawImage(logoImg, qrCenterX - (logoSize/2), qrCenterY - (logoSize/2), logoSize, logoSize);
+            }
+        }
 
         var photoX = 25; var photoY = 120; var fixedHeight = 132; var fixedWidth = 99; 
         if (photoImg) { 
